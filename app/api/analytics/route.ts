@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { fetchFeedbackRecords } from "@/lib/sheets";
+import { getAllFeedbacks } from "@/lib/db";
 import { aggregateDashboardData, FilterOptions } from "@/lib/aggregate";
 
 const AUTH_COOKIE_NAME = "gentleman_admin_session";
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const ageGroup = searchParams.get("ageGroup") || "all";
     const barber = searchParams.get("barber") || "all";
 
-    const records = await fetchFeedbackRecords();
+    const records = await getAllFeedbacks();
     const data = aggregateDashboardData(records, { dateRange, ageGroup, barber });
 
     return NextResponse.json(data);

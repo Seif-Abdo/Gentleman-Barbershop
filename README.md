@@ -8,10 +8,11 @@ A luxury black-and-gold website and executive analytics dashboard for **Gentlema
 
 - **Luxury Black & Gold Aesthetics:** Custom tokens (`#0B0B0B`, `#141414`, `#D4AF37`) tailored to the gentleman salon experience.
 - **Bilingual & RTL-First:** Native Egyptian Arabic with Right-to-Left (RTL) layout, plus a toggle for English.
-- **Live Google Forms Integration:**
-  - Forwarded through `/api/submit` to preserve Google Forms & Sheets as the zero-maintenance system of record.
-  - Automatically bridges the form's individual barber rating questions and hidden required fields.
-- **Automated Client Classification:** Automatically tags each client into **Young** (<18), **Youths** (18–44), or **Elderly** (45+).
+- **100% Native Form & Storage:**
+  - Independent, self-contained database storage (`data/feedbacks.json`) with zero external Google Forms/Sheets dependencies.
+  - Submissions are validated, tagged, and persisted directly with atomic writes.
+  - Age classification, sentiment tags, and keyword topic extraction happen automatically.
+- **Automated Client Classification:** Automatically categorizes clients into **Young** (<18), **Youths** (18–44), or **Elderly** (45+).
 - **Executive Analytics Dashboard (`/admin`):**
   - Password protected (default: `gentleman2026`).
   - Real-time KPIs: Response volume, Shop average score, Barbers average score, Positive share %, Low-rating alerts.
@@ -45,6 +46,13 @@ npm test
 
 Verifies age boundary conditions (17/18, 44/45, null), Arabic text rating conversions, and sentiment scoring.
 
+### 3. Build & Production Run
+
+```bash
+npm run build
+npm start
+```
+
 ---
 
 ## Configuration Guide for Shop Owner
@@ -71,14 +79,9 @@ export const BARBERS = [
 ### 3. Services and Pricing
 Edit `content/services.ts` to update haircuts, beard sculpts, VIP packages, and prices in EGP.
 
-### 4. Google Sheets Production Connection
-1. In your Google Form's **Responses** tab, click **Link to Sheets**.
-2. Create a Google Cloud Service Account and grant its email **Viewer** permission to the linked Google Sheet.
-3. Add the following to your `.env.local`:
+### 4. Admin Password
+Set `ADMIN_PASSWORD` in `.env.local` or in your Railway Variables tab:
 ```env
-GOOGLE_SHEET_ID=your_sheet_id_here
-GOOGLE_SERVICE_ACCOUNT_EMAIL=your_service_account@project.iam.gserviceaccount.com
-GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ADMIN_PASSWORD=your_secure_password
 ```
-*(If credentials are not yet configured, the dashboard automatically provides realistic seed analytics).*
+*(Default: `gentleman2026`)*
