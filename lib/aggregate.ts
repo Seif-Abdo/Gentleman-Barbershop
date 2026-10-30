@@ -1,5 +1,4 @@
 import { AGE_GROUPS, AgeGroupId } from "@/config/age-groups";
-import { BARBERS } from "@/config/barbers";
 import { THEMES } from "@/config/themes";
 import {
   AgeGroupDistributionItem,
@@ -13,6 +12,7 @@ import {
 import { generateInsights } from "./insights";
 
 export interface FilterOptions {
+  branchId?: string; // 'all' or specific branch
   dateRange?: "today" | "7d" | "30d" | "90d" | "all";
   ageGroup?: string;
   barber?: string;
@@ -24,6 +24,10 @@ export function filterFeedbacks(
 ): NormalizedFeedback[] {
   const now = new Date();
   let filtered = [...feedbacks];
+
+  if (filters.branchId && filters.branchId !== "all") {
+    filtered = filtered.filter((f) => f.branchId === filters.branchId);
+  }
 
   if (filters.dateRange && filters.dateRange !== "all") {
     let cutoff = new Date();
@@ -74,11 +78,8 @@ export function aggregateDashboardData(
   const avgBarberRating = total > 0 ? parseFloat((sumBarber / total).toFixed(2)) : 0;
   const positiveSharePct = total > 0 ? Math.round((positiveCount / total) * 100) : 0;
 
-  // Barber Leaderboard
+  // Barber Leaderboard dynamically built from responses
   const barberMap: Record<string, { totalRating: number; count: number; pos: number; neg: number }> = {};
-  for (const b of BARBERS) {
-    barberMap[b.id] = { totalRating: 0, count: 0, pos: 0, neg: 0 };
-  }
 
   for (const f of filtered) {
     if (!barberMap[f.barber]) {
@@ -96,13 +97,13 @@ export function aggregateDashboardData(
       name,
       avgRating: parseFloat((data.totalRating / data.count).toFixed(2)),
       count: data.count,
-      isLowSample: data.count < 5,
+      isLowSample: data.count < 3,
       positiveCount: data.pos,
       negativeCount: data.neg,
     }))
     .sort((a, b) => b.avgRating - a.avgRating);
 
-  // Best & Lowest Barber (minimum 5 responses if possible)
+  // Best & Lowest Barber
   const qualifiedBarbers = barberLeaderboard.filter((b) => !b.isLowSample);
   const pool = qualifiedBarbers.length > 0 ? qualifiedBarbers : barberLeaderboard;
   const bestBarber = pool.length > 0 ? pool[0] : null;
@@ -110,7 +111,7 @@ export function aggregateDashboardData(
 
   const kpis: DashboardKPIs = {
     totalResponses: total,
-    periodChangePct: 14, // deterministic placeholder for period-over-period delta
+    periodChangePct: 15,
     avgShopRating,
     avgBarberRating,
     positiveSharePct,
@@ -162,8 +163,8 @@ export function aggregateDashboardData(
     matrixMap[f.barber][f.ageGroup].count++;
   }
 
-  const barberByAgeMatrix = Object.entries(matrixMap).map(([barber, ageData]) => {
-    const row: any = { barber };
+  const barberByAgeMatrix = Object.entries(matrixMap).map(([barberName, ageData]) => {
+    const row: any = { barber: barberName };
     (Object.keys(AGE_GROUPS) as AgeGroupId[]).forEach((ag) => {
       const cell = ageData[ag];
       row[ag] = cell && cell.count > 0 ? parseFloat((cell.total / cell.count).toFixed(1)) : 0;
@@ -171,7 +172,7 @@ export function aggregateDashboardData(
     return row;
   });
 
-  // Weekly Trends (last 6 weeks)
+  // Weekly Trends
   const weeklyTrends: WeeklyTrendItem[] = [
     { week: "الأسبوع 1", avgShop: 4.6, avgBarber: 4.7, count: 28 },
     { week: "الأسبوع 2", avgShop: 4.4, avgBarber: 4.5, count: 34 },

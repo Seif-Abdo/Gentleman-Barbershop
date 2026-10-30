@@ -1,27 +1,50 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { verifyAdminCredentials } from "@/lib/db";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "gentleman2026";
-const AUTH_COOKIE_NAME = "gentleman_admin_session";
+const AUTH_COOKIE_NAME = "gentleman_portal_session";
 
 export async function POST(req: Request) {
   try {
-    const { password } = await req.json();
+    const { username, password } = await req.json();
 
-    if (password === ADMIN_PASSWORD) {
-      const cookieStore = await cookies();
-      cookieStore.set(AUTH_COOKIE_NAME, "authenticated_session_token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        path: "/",
-      });
-
-      return NextResponse.json({ success: true, message: "Logged in successfully" });
+    if (!username || !password) {
+      return NextResponse.json(
+        { error: "يرجى إدخال اسم المستخدم وكلمة المرور / Username and password are required" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ error: "كلمة المرور غير صحيحة / Incorrect password" }, { status: 401 });
+    const admin = await verifyAdminCredentials(username, password);
+    if (!admin) {
+      return NextResponse.json(
+        { error: "بيانات الدخول غير صحيحة / Invalid username or password" },
+        { status: 401 }
+      );
+    }
+
+    const sessionData = {
+      id: admin.id,
+      username: admin.username,
+      name: admin.name,
+      role: admin.role,
+      branchId: admin.branchId || "all",
+    };
+
+    const cookieStore = await cookies();
+    cookieStore.set(AUTH_COOKIE_NAME, JSON.stringify(sessionData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    });
+
+    return NextResponse.json({
+      success: true,
+      user: sessionData,
+      message: "تم تسجيل الدخول بنجاح / Logged in successfully",
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
@@ -35,7 +58,16 @@ export async function DELETE() {
 
 export async function GET() {
   const cookieStore = await cookies();
-  const session = cookieStore.get(AUTH_COOKIE_NAME);
-  const isAuthenticated = Boolean(session && session.value === "authenticated_session_token");
-  return NextResponse.json({ isAuthenticated });
+  const sessionCookie = cookieStore.get(AUTH_COOKIE_NAME);
+
+  if (!sessionCookie) {
+    return NextResponse.json({ isAuthenticated: false, user: null });
+  }
+
+  try {
+    const user = JSON.parse(sessionCookie.value);
+    return NextResponse.json({ isAuthenticated: true, user });
+  } catch {
+    return NextResponse.json({ isAuthenticated: false, user: null });
+  }
 }

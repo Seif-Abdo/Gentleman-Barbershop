@@ -5,7 +5,10 @@ export type SentimentType = "positive" | "neutral" | "negative";
 export interface NormalizedFeedback {
   id: string;
   timestamp: string; // ISO string
-  dateDisplay: string; // e.g. 2026-10-27
+  dateDisplay: string; // e.g. 2026-10-30
+  branchId: string; // 'zahraa-maadi' | 'nasr-city' | 'new-maadi'
+  clientPhone?: string; // Captured for loyalty & WhatsApp campaigns
+  clientName?: string;
   age: number | null;
   ageGroup: AgeGroupId;
   barber: string;
@@ -53,7 +56,7 @@ export interface BarberLeaderboardItem {
 }
 
 export interface WeeklyTrendItem {
-  week: string; // e.g. "Week 42" or "10/14 - 10/20"
+  week: string;
   avgShop: number;
   avgBarber: number;
   count: number;
@@ -79,4 +82,51 @@ export interface DashboardData {
   themeMetrics: ThemeMetricItem[];
   insights: { id: string; type: "alert" | "success" | "info"; textAr: string; textEn: string }[];
   recentFeedbacks: NormalizedFeedback[];
+}
+
+// Multi-admin RBAC
+export type AdminRole = "master_admin" | "branch_admin";
+
+export interface AdminUser {
+  id: string;
+  username: string; // e.g. "admin" or email
+  name: string;
+  role: AdminRole;
+  branchId?: string | "all"; // Specific branch or all
+  password: string;
+  createdAt: string;
+}
+
+// WhatsApp Campaign Management
+export interface WhatsAppTemplate {
+  id: string;
+  name: string;
+  nameAr: string;
+  category: "promotional" | "satisfaction" | "welcome" | "recovery";
+  bodyAr: string;
+  bodyEn: string;
+  variables: string[]; // ['{{name}}', '{{branch}}', '{{discount}}']
+}
+
+export interface WhatsAppCampaign {
+  id: string;
+  name: string;
+  templateId: string;
+  targetFilter: {
+    branchId: string; // 'all' or branch slug
+    ageGroup: string; // 'all' or age group
+    sentiment: string; // 'all' | 'positive' | 'negative' | 'neutral'
+  };
+  audienceCount: number;
+  status: "draft" | "sent" | "scheduled";
+  sentAt?: string;
+  createdAt: string;
+}
+
+export interface WhatsAppSettings {
+  phoneNumberId: string;
+  wabaId: string;
+  accessToken: string;
+  testRecipientNumber: string;
+  isEnabled: boolean;
 }

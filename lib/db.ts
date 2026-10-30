@@ -1,237 +1,406 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { NormalizedFeedback } from "./types";
+import {
+  AdminUser,
+  NormalizedFeedback,
+  WhatsAppCampaign,
+  WhatsAppSettings,
+  WhatsAppTemplate,
+} from "./types";
 import { normalizeRecord } from "./normalize";
+import { Branch, DEFAULT_BRANCHES } from "@/config/branches";
+import { Barber, DEFAULT_BARBERS } from "@/config/barbers";
 
 const DATA_DIR = path.join(process.cwd(), "data");
-const DB_FILE = path.join(DATA_DIR, "feedbacks.json");
+const FEEDBACKS_FILE = path.join(DATA_DIR, "feedbacks.json");
+const BRANCHES_FILE = path.join(DATA_DIR, "branches.json");
+const BARBERS_FILE = path.join(DATA_DIR, "barbers.json");
+const ADMINS_FILE = path.join(DATA_DIR, "admins.json");
+const CAMPAIGNS_FILE = path.join(DATA_DIR, "campaigns.json");
+const WA_SETTINGS_FILE = path.join(DATA_DIR, "whatsapp_settings.json");
 
-// Seed records to ensure dashboard has immediate rich metrics out of the box
-const DEFAULT_SEED_DATA = [
+// Default Pre-approved WhatsApp Templates
+export const DEFAULT_WA_TEMPLATES: WhatsAppTemplate[] = [
   {
-    age: 26,
-    barber: "سعيد",
-    barberRating: 5,
-    barberLikes: "قصة ممتازة وتحديد لحية بالملي كالعادة. سعيد فنان حقيقي.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "المحل فخم ونظيف جداً وريحة العطر جميلة والضيافة ممتازة.",
-    shopImprovements: "",
-    suggestion: "ياريت توفروا دفع إلكتروني بفيزا أو فودافون كاش.",
+    id: "tpl_vip_welcome",
+    name: "VIP Welcome & 20% Discount",
+    nameAr: "ترحيب ملكي وخصم 20% على الزيارة القادمة",
+    category: "welcome",
+    bodyAr: "أهلاً بك يا {{name}} في صالون جنتل مان! ✂️ يسعدنا تقديم خصم خاص 20% لك على باقة الحلاقة الملكية القادمة في فرع {{branch}}. استخدم كود VIP20 عند زيارتك القادمة. بانتظار تشريفك!",
+    bodyEn: "Hello {{name}}! Welcome to Gentleman Barbershop ✂️ Enjoy an exclusive 20% discount on your next Royal Grooming package at our {{branch}} branch with code VIP20.",
+    variables: ["{{name}}", "{{branch}}", "{{discount}}"],
   },
   {
-    age: 16,
-    barber: "احمد",
-    barberRating: 5,
-    barberLikes: "أحسن تدريج فيد عملته في حياتي، فاهم الاستايل الشبابي صح.",
-    barberImprovements: "",
-    shopRating: 4,
-    shopLikes: "المكان شيك والموسيقى رايقة.",
-    shopImprovements: "",
-    suggestion: "ممكن تحطوا شاحن تايب سي جنب كراسي الانتظار.",
+    id: "tpl_satisfaction_recovery",
+    name: "VIP Care & Service Recovery",
+    nameAr: "اعتذار وجلسة عناية ملكية مجانية (للتقييمات المنخفضة)",
+    category: "recovery",
+    bodyAr: "مرحباً يا {{name}}، نأسف جداً إذا كانت تجربتك الأخيرة في فرع {{branch}} لم ترقَ لتوقعاتك. إدارة جنتل مان حريصة على رضاك، ويسرنا دعوتك لجلسة حلاقة وتصفيف مجانية تماماً مع كبير الحلاقين لتعويضك. يسعدنا تواصلك معنا مباشرة لتنسيق الموعد.",
+    bodyEn: "Dear {{name}}, we apologize if your recent visit to our {{branch}} branch did not meet your expectations. Management invites you for a complimentary VIP grooming session with our master barber.",
+    variables: ["{{name}}", "{{branch}}"],
   },
   {
-    age: 52,
-    barber: "طارق",
-    barberRating: 4,
-    barberLikes: "حلاقة ممتازة بالموس الساخن وإيده خفيفة جداً ومحترم.",
-    barberImprovements: "تنسيق المواعيد أفضل",
-    shopRating: 3,
-    shopLikes: "المحل نظيف",
-    shopImprovements: "التكييف كان بارد زيادة وكان في انتظار نص ساعة.",
-    suggestion: "تنظيم وقت المواعيد لتجنب الانتظار الطويل لكبار السن.",
+    id: "tpl_weekend_offer",
+    name: "Weekend Special Grooming",
+    nameAr: "عرض الويك إند الخاص - باقة العناية واللحية",
+    category: "promotional",
+    bodyAr: "استعد لعطلة نهاية الأسبوع بأناقة تليق بك! 🌟 احجز باقة جنتل مان VIP (قص شعر + تحديد لحية + فوطة ساخنة) في فرع {{branch}} واحصل على جلسة بخار للوجه هدية مجانية. للحجز المباشر أرسل لنا رسالة الآن.",
+    bodyEn: "Get weekend-ready with Gentleman Barbershop! 🌟 Book our VIP grooming package at {{branch}} and receive a complimentary facial steam treatment.",
+    variables: ["{{name}}", "{{branch}}"],
   },
   {
-    age: 32,
-    barber: "محمود",
-    barberRating: 5,
-    barberLikes: "عملت باقة العرسان مع محمود، شغل ولا غلطة وبقمة الاحترافية.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "أفضل صالون حلاقة في المعادي بدون منازع.",
-    shopImprovements: "",
-    suggestion: "استمروا على نفس المستوى الرائع.",
-  },
-  {
-    age: 22,
-    barber: "محمد",
-    barberRating: 4,
-    barberLikes: "شاطر جداً في تدريج الدقن ورسم الخطوط.",
-    barberImprovements: "",
-    shopRating: 4,
-    shopLikes: "كراسي مريحة جداً وأجواء هادية.",
-    shopImprovements: "",
-    suggestion: "توفير قهوة إسبريسو لزبائن الصالون.",
-  },
-  {
-    age: 47,
-    barber: "على",
-    barberRating: 5,
-    barberLikes: "علي متمكن وخبرة وفاهم نوع الشعر وإزاي يتعامل مع الشيب.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "نظافة وتعقيم الأدوات أمام العميل تعطي ثقة كبيرة.",
-    shopImprovements: "",
-    suggestion: "لا يوجد، كل شيء ممتاز.",
-  },
-  {
-    age: 15,
-    barber: "محمد",
-    barberRating: 5,
-    barberLikes: "محمد عملي القصة اللي كنت عايزها بالضبط زي الصورة.",
-    barberImprovements: "",
-    shopRating: 4,
-    shopLikes: "مكان شبابي وراقي.",
-    shopImprovements: "",
-    suggestion: "عمل خصم خاص للطلبة.",
-  },
-  {
-    age: 38,
-    barber: "سعيد",
-    barberRating: 5,
-    barberLikes: "سعيد دائماً في الموعد وشغله دقيق ومنظم.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "استقبال وترحاب من كل العاملين.",
-    shopImprovements: "",
-    suggestion: "إضافة شاشات لعرض مباريات في منطقة الانتظار.",
-  },
-  {
-    age: 29,
-    barber: "احمد",
-    barberRating: 2,
-    barberLikes: "قصة عادية",
-    barberImprovements: "قص الشعر أقصر مما طلبت وكان مستعجل عشان الزبون اللي بعدي.",
-    shopRating: 3,
-    shopLikes: "المحل نظيف",
-    shopImprovements: "زحام شديد بدون تنظيم",
-    suggestion: "عدم الاستعجال في القصة حتى في أوقات الذروة.",
-  },
-  {
-    age: 58,
-    barber: "على",
-    barberRating: 4,
-    barberLikes: "معاملة طيبة واحترام كبير وشغل متقن.",
-    barberImprovements: "",
-    shopRating: 4,
-    shopLikes: "مكان مريح لكبار السن.",
-    shopImprovements: "",
-    suggestion: "تخفيض صوت الموسيقى قليلاً.",
-  },
-  {
-    age: 24,
-    barber: "طارق",
-    barberRating: 5,
-    barberLikes: "جلسة البخار والعناية باللحية كانت تجربة استرخاء خيالية.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "الفوط معقمة وساخنة والتجربة ممتعة.",
-    shopImprovements: "",
-    suggestion: "ياريت تفتحوا فرع تاني في التجمع الخامس.",
-  },
-  {
-    age: 35,
-    barber: "محمود",
-    barberRating: 4,
-    barberLikes: "محمود فاهم الشغل وشغله نظيف ومؤدب جداً.",
-    barberImprovements: "",
-    shopRating: 4,
-    shopLikes: "السعر مناسب جداً لجودة الخدمة المقدمة.",
-    shopImprovements: "",
-    suggestion: "خدمة الحجز المسبق عبر الواتساب لتفادي الطوابير.",
-  },
-  {
-    age: 19,
-    barber: "محمد",
-    barberRating: 5,
-    barberLikes: "أحسن حلاق في القاهرة، فنان في التدرج.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "الديكور الأسود والذهبي فخم جداً.",
-    shopImprovements: "",
-    suggestion: "كل شيء ممتاز ربنا يوفقكم.",
-  },
-  {
-    age: 63,
-    barber: "سعيد",
-    barberRating: 5,
-    barberLikes: "زبون عند سعيد من سنين، أمانة وذوق ونظافة لا مثيل لها.",
-    barberImprovements: "",
-    shopRating: 5,
-    shopLikes: "المحل نموذج للرقي والنظافة.",
-    shopImprovements: "",
-    suggestion: "استمروا على هذا المستوى الأخلاقي والمهني العالي.",
-  },
-  {
-    age: 28,
-    barber: "احمد",
-    barberRating: 4,
-    barberLikes: "شغل محترم وسريع والنتيجة مرضية جداً.",
-    barberImprovements: "",
-    shopRating: 4,
-    shopLikes: "مكان محترم ومريح.",
-    shopImprovements: "",
-    suggestion: "توفير منتجات تصفيف الشعر للشراء المباشر في الصالون.",
+    id: "tpl_we_miss_you",
+    name: "We Miss You VIP Offer",
+    nameAr: "اشتقنا لزيارتك - خصم 15% للعملاء الدائمين",
+    category: "promotional",
+    bodyAr: "أهلاً {{name}}، لاحظنا غيابك عنا في الفترة الماضية! ✂️ كرسي الحلاقة بانتظارك في فرع {{branch}}، ويسرنا تقديم كود خصم 15% خاص لك: BACK15. احجز موعدك اليوم لنعتني بإطلالتك.",
+    bodyEn: "Hello {{name}}, we haven't seen you in a while! ✂️ Your chair is waiting at {{branch}}. Use code BACK15 for 15% off your next cut.",
+    variables: ["{{name}}", "{{branch}}"],
   },
 ];
 
-// In-memory cache to guarantee fast response times
-let inMemoryFeedbacks: NormalizedFeedback[] | null = null;
+// Default Seed Admins
+const DEFAULT_ADMINS: AdminUser[] = [
+  {
+    id: "admin-master",
+    username: "master",
+    name: "مدير عام الصالون (Owner)",
+    role: "master_admin",
+    branchId: "all",
+    password: "gentleman2026",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "admin-zahraa",
+    username: "admin_zahraa",
+    name: "مدير فرع زهراء المعادي",
+    role: "branch_admin",
+    branchId: "zahraa-maadi",
+    password: "zahraa2026",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "admin-nasrcity",
+    username: "admin_nasrcity",
+    name: "مدير فرع مدينة نصر",
+    role: "branch_admin",
+    branchId: "nasr-city",
+    password: "nasr2026",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "admin-newmaadi",
+    username: "admin_newmaadi",
+    name: "مدير فرع المعادي الجديدة",
+    role: "branch_admin",
+    branchId: "new-maadi",
+    password: "maadi2026",
+    createdAt: new Date().toISOString(),
+  },
+];
 
+// Rich Multi-branch Seed Data
+const SEED_FEEDBACKS = [
+  // Zahraa El Maadi
+  {
+    branchId: "zahraa-maadi",
+    clientName: "كريم أحمد",
+    clientPhone: "+201012345678",
+    age: 28,
+    barber: "سعيد",
+    barberRating: 5,
+    barberLikes: "سعيد فنان وأسلوبه راقي جداً في القص وتحديد اللحية.",
+    shopRating: 5,
+    shopLikes: "المحل نظيف جداً وفخم والضيافة ممتازة.",
+    suggestion: "توفير دفع بفيزا أو انستاباي.",
+  },
+  {
+    branchId: "zahraa-maadi",
+    clientName: "يوسف حسن",
+    clientPhone: "+201098765432",
+    age: 17,
+    barber: "احمد",
+    barberRating: 5,
+    barberLikes: "أحسن تدريج فيد عملته، فاهم الموضة صح.",
+    shopRating: 4,
+    shopLikes: "ديكور شيك وموسيقى هادية.",
+    suggestion: "شواحن للهواتف في صالة الانتظار.",
+  },
+  {
+    branchId: "zahraa-maadi",
+    clientName: "الحاج مصطفى",
+    clientPhone: "+201122334455",
+    age: 56,
+    barber: "طارق",
+    barberRating: 4,
+    barberLikes: "حلاقة ممتازة بالموس الساخن وأدب كبير.",
+    shopRating: 3,
+    shopLikes: "المحل نظيف ولكن كان هناك انتظار نصف ساعة.",
+    suggestion: "الالتزام بالمواعيد المسبقة لكبار السن.",
+  },
+  {
+    branchId: "zahraa-maadi",
+    clientName: "عمر فاروق",
+    clientPhone: "+201234567890",
+    age: 34,
+    barber: "محمود",
+    barberRating: 5,
+    barberLikes: "باقة العريس مع محمود كانت خيالية وريحتني قبل الفرح.",
+    shopRating: 5,
+    shopLikes: "أفضل خدمة حلاقة في زهراء المعادي.",
+    suggestion: "استمروا على هذا المستوى الرائع.",
+  },
+
+  // Nasr City
+  {
+    branchId: "nasr-city",
+    clientName: "أحمد سراج",
+    clientPhone: "+201055566677",
+    age: 25,
+    barber: "محمد رفاعي",
+    barberRating: 5,
+    barberLikes: "محمد رفاعي دقيق جداً في التدرج والقصة طلعت مضبوطة بالملي.",
+    shopRating: 5,
+    shopLikes: "فرع مدينة نصر تصميمه حديث ومكانه مميز في عباس العقاد.",
+    suggestion: "ياريت توفروا تطبيق حجز أونلاين.",
+  },
+  {
+    branchId: "nasr-city",
+    clientName: "هيثم توفيق",
+    clientPhone: "+201099887766",
+    age: 31,
+    barber: "وليد جمال",
+    barberRating: 5,
+    barberLikes: "وليد متمكن في نحت اللحية بالموس وشغله مريح جداً.",
+    shopRating: 4,
+    shopLikes: "كراسي مريحة وأدوات معقمة أمام العميل.",
+    suggestion: "توفير قهوة لزوار الفرع.",
+  },
+  {
+    branchId: "nasr-city",
+    clientName: "حسام خليل",
+    clientPhone: "+201144556677",
+    age: 19,
+    barber: "عمر زين",
+    barberRating: 5,
+    barberLikes: "عمر فنان في القصات الشبابية والمودرن.",
+    shopRating: 5,
+    shopLikes: "الفرع سريع ومفيش انتظار طويل.",
+    suggestion: "عمل خصم للطلاب.",
+  },
+  {
+    branchId: "nasr-city",
+    clientName: "طارق عبد المنعم",
+    clientPhone: "+201288990011",
+    age: 48,
+    barber: "محمد محمود",
+    barberRating: 4,
+    barberLikes: "محمد محمود مريح في التعامل وأخلاقه عالية.",
+    shopRating: 4,
+    shopLikes: "جلسة البخار كانت ممتازة وتستحق.",
+    suggestion: "تخفيض صوت الموسيقى في المساء.",
+  },
+  {
+    branchId: "nasr-city",
+    clientName: "ماجد سامي",
+    clientPhone: "+201011223344",
+    age: 27,
+    barber: "اسلام ماهر",
+    barberRating: 2,
+    barberLikes: "قصة عادية",
+    barberImprovements: "كان مستعجل شوية عشان زحمة الجمعة.",
+    shopRating: 3,
+    shopLikes: "المكان نظيف",
+    shopImprovements: "تنظيم وقت الانتظار أيام الإجازات.",
+    suggestion: "زيادة عدد الكراسي في أوقات الذروة.",
+  },
+
+  // New Maadi
+  {
+    branchId: "new-maadi",
+    clientName: "شريف النجار",
+    clientPhone: "+201077665544",
+    age: 36,
+    barber: "احمد سيد",
+    barberRating: 5,
+    barberLikes: "أحمد سيد أستاذ في المقص الكلاسيكي، راحة نفسية وشغل عالي.",
+    shopRating: 5,
+    shopLikes: "فرع المعادي الجديدة هادئ جداً وفخم ونظيف للغاية.",
+    suggestion: "توفير مساحات انتظار خارجية.",
+  },
+  {
+    branchId: "new-maadi",
+    clientName: "ياسر رضوان",
+    clientPhone: "+201199887755",
+    age: 51,
+    barber: "خالد سيد",
+    barberRating: 5,
+    barberLikes: "خالد إيده خفيفة جداً في حلاقة الذقن بالفوط الساخنة.",
+    shopRating: 5,
+    shopLikes: "التعقيم في الفرع على أعلى مستوى عالمي.",
+    suggestion: "كل شيء ممتاز ربنا يوفقكم.",
+  },
+  {
+    branchId: "new-maadi",
+    clientName: "زياد الشريف",
+    clientPhone: "+201211335577",
+    age: 22,
+    barber: "عبدالله",
+    barberRating: 5,
+    barberLikes: "عبدالله فنان في جلسات تنظيف البشرة وتحديد الذقن.",
+    shopRating: 5,
+    shopLikes: "ديكور الأسود والذهب في الفرع يفتح النفس.",
+    suggestion: "توفير باقات اشتراك شهرية.",
+  },
+];
+
+// Initialize and ensure data files exist
 async function ensureDbInitialized(): Promise<void> {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    try {
-      await fs.access(DB_FILE);
-    } catch {
-      // File does not exist, initialize with seed records
-      const now = Date.now();
-      const dayMs = 24 * 60 * 60 * 1000;
-      const initial: NormalizedFeedback[] = DEFAULT_SEED_DATA.map((seed, idx) => {
-        const daysAgo = idx % 28;
-        const time = new Date(now - daysAgo * dayMs - idx * 100000).toISOString();
-        return normalizeRecord({
-          id: `seed-${idx + 1}`,
-          timestamp: time,
-          age: seed.age,
-          barber: seed.barber,
-          barberRating: seed.barberRating,
-          barberLikes: seed.barberLikes,
-          barberImprovements: seed.barberImprovements,
-          shopRating: seed.shopRating,
-          shopLikes: seed.shopLikes,
-          shopImprovements: seed.shopImprovements,
-          suggestion: seed.suggestion,
-        });
-      });
+  await fs.mkdir(DATA_DIR, { recursive: true });
 
-      await fs.writeFile(DB_FILE, JSON.stringify(initial, null, 2), "utf-8");
-      inMemoryFeedbacks = initial;
-    }
-  } catch (err) {
-    console.error("[Database] Initialization error:", err);
+  // 1. Branches
+  try {
+    await fs.access(BRANCHES_FILE);
+  } catch {
+    await fs.writeFile(BRANCHES_FILE, JSON.stringify(DEFAULT_BRANCHES, null, 2), "utf-8");
+  }
+
+  // 2. Barbers
+  try {
+    await fs.access(BARBERS_FILE);
+  } catch {
+    await fs.writeFile(BARBERS_FILE, JSON.stringify(DEFAULT_BARBERS, null, 2), "utf-8");
+  }
+
+  // 3. Admins
+  try {
+    await fs.access(ADMINS_FILE);
+  } catch {
+    await fs.writeFile(ADMINS_FILE, JSON.stringify(DEFAULT_ADMINS, null, 2), "utf-8");
+  }
+
+  // 4. WhatsApp Settings
+  try {
+    await fs.access(WA_SETTINGS_FILE);
+  } catch {
+    const defaultSettings: WhatsAppSettings = {
+      phoneNumberId: "",
+      wabaId: "",
+      accessToken: "",
+      testRecipientNumber: "+201001234567",
+      isEnabled: false,
+    };
+    await fs.writeFile(WA_SETTINGS_FILE, JSON.stringify(defaultSettings, null, 2), "utf-8");
+  }
+
+  // 5. Campaigns
+  try {
+    await fs.access(CAMPAIGNS_FILE);
+  } catch {
+    const defaultCampaigns: WhatsAppCampaign[] = [
+      {
+        id: "camp-1",
+        name: "حملة الترحيب وكوبون VIP20",
+        templateId: "tpl_vip_welcome",
+        targetFilter: {
+          branchId: "all",
+          ageGroup: "all",
+          sentiment: "all",
+        },
+        audienceCount: 12,
+        status: "sent",
+        sentAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+        createdAt: new Date(Date.now() - 4 * 86400000).toISOString(),
+      },
+    ];
+    await fs.writeFile(CAMPAIGNS_FILE, JSON.stringify(defaultCampaigns, null, 2), "utf-8");
+  }
+
+  // 6. Feedbacks
+  try {
+    await fs.access(FEEDBACKS_FILE);
+  } catch {
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const initial: NormalizedFeedback[] = SEED_FEEDBACKS.map((seed, idx) => {
+      const daysAgo = idx % 25;
+      const time = new Date(now - daysAgo * dayMs - idx * 100000).toISOString();
+      return normalizeRecord({
+        id: `seed-${idx + 1}`,
+        timestamp: time,
+        branchId: seed.branchId,
+        clientName: seed.clientName,
+        clientPhone: seed.clientPhone,
+        age: seed.age,
+        barber: seed.barber,
+        barberRating: seed.barberRating,
+        barberLikes: seed.barberLikes,
+        shopRating: seed.shopRating,
+        shopLikes: seed.shopLikes,
+        suggestion: seed.suggestion,
+      });
+    });
+    await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(initial, null, 2), "utf-8");
   }
 }
 
+// ================= BRANCHES =================
+export async function getAllBranches(): Promise<Branch[]> {
+  await ensureDbInitialized();
+  try {
+    const raw = await fs.readFile(BRANCHES_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return DEFAULT_BRANCHES;
+  }
+}
+
+export async function saveBranches(branches: Branch[]): Promise<void> {
+  await ensureDbInitialized();
+  await fs.writeFile(BRANCHES_FILE, JSON.stringify(branches, null, 2), "utf-8");
+}
+
+export async function getBranchById(id: string): Promise<Branch | null> {
+  const branches = await getAllBranches();
+  return branches.find((b) => b.id === id) || null;
+}
+
+// ================= BARBERS =================
+export async function getAllBarbers(): Promise<Barber[]> {
+  await ensureDbInitialized();
+  try {
+    const raw = await fs.readFile(BARBERS_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return DEFAULT_BARBERS;
+  }
+}
+
+export async function saveBarbers(barbers: Barber[]): Promise<void> {
+  await ensureDbInitialized();
+  await fs.writeFile(BARBERS_FILE, JSON.stringify(barbers, null, 2), "utf-8");
+}
+
+export async function getBarbersForBranch(branchId: string): Promise<Barber[]> {
+  const barbers = await getAllBarbers();
+  return barbers.filter((b) => b.branchId === branchId && b.isActive);
+}
+
+// ================= FEEDBACKS =================
 export async function getAllFeedbacks(): Promise<NormalizedFeedback[]> {
   await ensureDbInitialized();
-
-  if (inMemoryFeedbacks) {
-    return inMemoryFeedbacks;
-  }
-
   try {
-    const raw = await fs.readFile(DB_FILE, "utf-8");
-    const parsed: NormalizedFeedback[] = JSON.parse(raw);
-    inMemoryFeedbacks = parsed;
-    return parsed;
-  } catch (err) {
-    console.error("[Database] Failed to read feedbacks file:", err);
+    const raw = await fs.readFile(FEEDBACKS_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
     return [];
   }
 }
 
 export async function insertFeedback(input: {
+  branchId?: string;
+  clientName?: string;
+  clientPhone?: string;
   age?: number | string | null;
   barber: string;
   barberRating: number;
@@ -247,6 +416,9 @@ export async function insertFeedback(input: {
   const record = normalizeRecord({
     id: `fb-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     timestamp: new Date().toISOString(),
+    branchId: input.branchId || "zahraa-maadi",
+    clientName: input.clientName,
+    clientPhone: input.clientPhone,
     age: input.age,
     barber: input.barber,
     barberRating: input.barberRating,
@@ -261,15 +433,77 @@ export async function insertFeedback(input: {
   const existing = await getAllFeedbacks();
   const updated = [record, ...existing];
 
-  // Write atomically
-  inMemoryFeedbacks = updated;
   try {
-    const tempFile = `${DB_FILE}.tmp`;
+    const tempFile = `${FEEDBACKS_FILE}.tmp`;
     await fs.writeFile(tempFile, JSON.stringify(updated, null, 2), "utf-8");
-    await fs.rename(tempFile, DB_FILE);
+    await fs.rename(tempFile, FEEDBACKS_FILE);
   } catch (err) {
-    console.error("[Database] Error writing to disk:", err);
+    console.error("[Database] Error writing feedback to disk:", err);
   }
 
   return record;
+}
+
+// ================= ADMINS =================
+export async function getAllAdmins(): Promise<AdminUser[]> {
+  await ensureDbInitialized();
+  try {
+    const raw = await fs.readFile(ADMINS_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return DEFAULT_ADMINS;
+  }
+}
+
+export async function saveAdmins(admins: AdminUser[]): Promise<void> {
+  await ensureDbInitialized();
+  await fs.writeFile(ADMINS_FILE, JSON.stringify(admins, null, 2), "utf-8");
+}
+
+export async function verifyAdminCredentials(
+  username: string,
+  pass: string
+): Promise<AdminUser | null> {
+  const admins = await getAllAdmins();
+  const user = admins.find(
+    (a) => a.username.toLowerCase() === username.toLowerCase().trim() && a.password === pass
+  );
+  return user || null;
+}
+
+// ================= WHATSAPP CAMPAIGNS & SETTINGS =================
+export async function getWhatsAppSettings(): Promise<WhatsAppSettings> {
+  await ensureDbInitialized();
+  try {
+    const raw = await fs.readFile(WA_SETTINGS_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return {
+      phoneNumberId: "",
+      wabaId: "",
+      accessToken: "",
+      testRecipientNumber: "",
+      isEnabled: false,
+    };
+  }
+}
+
+export async function saveWhatsAppSettings(settings: WhatsAppSettings): Promise<void> {
+  await ensureDbInitialized();
+  await fs.writeFile(WA_SETTINGS_FILE, JSON.stringify(settings, null, 2), "utf-8");
+}
+
+export async function getAllCampaigns(): Promise<WhatsAppCampaign[]> {
+  await ensureDbInitialized();
+  try {
+    const raw = await fs.readFile(CAMPAIGNS_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export async function saveCampaigns(campaigns: WhatsAppCampaign[]): Promise<void> {
+  await ensureDbInitialized();
+  await fs.writeFile(CAMPAIGNS_FILE, JSON.stringify(campaigns, null, 2), "utf-8");
 }

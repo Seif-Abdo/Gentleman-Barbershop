@@ -11,6 +11,9 @@ export async function POST(req: Request) {
     }
 
     const {
+      branchId,
+      clientName,
+      clientPhone,
       age,
       barber,
       barberRating,
@@ -32,6 +35,9 @@ export async function POST(req: Request) {
 
     // Save directly to the website's native database
     const savedRecord = await insertFeedback({
+      branchId: branchId || "zahraa-maadi",
+      clientName: String(clientName || "").trim(),
+      clientPhone: String(clientPhone || "").trim(),
       age: age ? parseInt(String(age), 10) : null,
       barber,
       barberRating: Number(barberRating),
@@ -46,6 +52,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       feedbackId: savedRecord.id,
+      branchId: savedRecord.branchId,
       ageGroup: savedRecord.ageGroup,
       message: "تم حفظ التقييم بنجاح / Feedback saved successfully",
     });

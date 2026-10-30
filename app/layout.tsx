@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { LanguageProvider } from "@/components/LanguageContext";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { ClientShell } from "@/components/ClientShell";
 
 export const metadata: Metadata = {
   title: "Gentleman Barbershop | صالون جنتل مان للرجال",
-  description: "صالون جنتل مان - أرقى تجارب الحلاقة الكلاسيكية والعصرية، العناية باللحية، وحمامات البخار الملكية في القاهرة.",
-  keywords: ["صالون حلاقة", "حلاق رجالي", "صالون جنتل مان", "Gentleman Barbershop", "حلاقة القاهرة", "تدريج فيد"],
+  description: "صالون جنتل مان - أرقى تجارب الحلاقة الكلاسيكية والعصرية، العناية باللحية، وحمامات البخار الملكية في فروعنا (زهراء المعادي، مدينة نصر، المعادي الجديدة).",
+  keywords: ["صالون حلاقة", "حلاق رجالي", "صالون جنتل مان", "Gentleman Barbershop", "زهراء المعادي", "مدينة نصر", "المعادي الجديدة"],
   icons: {
     icon: "/favicon.ico",
   },
@@ -20,12 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" className="dark">
-      <body className="bg-bg text-ivory antialiased flex flex-col min-h-screen">
-        <LanguageProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </LanguageProvider>
+      <body className="bg-bg text-ivory antialiased min-h-screen">
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );

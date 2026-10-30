@@ -28,11 +28,14 @@ export function deriveSentiment(shopRating: number, barberRating: number): Senti
 }
 
 /**
- * Normalizes a single feedback row from Sheets or Web submission
+ * Normalizes a single feedback row from DB or Web submission
  */
 export function normalizeRecord(raw: {
   id?: string;
   timestamp?: string | Date;
+  branchId?: string;
+  clientPhone?: string;
+  clientName?: string;
   age?: number | string | null;
   barber?: string;
   barberRating?: any;
@@ -49,6 +52,10 @@ export function normalizeRecord(raw: {
   const validDate = isNaN(dateObj.getTime()) ? new Date() : dateObj;
   const iso = validDate.toISOString();
   const dateDisplay = iso.split("T")[0];
+
+  const branchId = raw.branchId || "zahraa-maadi";
+  const clientPhone = raw.clientPhone ? String(raw.clientPhone).trim() : undefined;
+  const clientName = raw.clientName ? String(raw.clientName).trim() : undefined;
 
   const parsedAge =
     raw.age !== undefined && raw.age !== null && String(raw.age).trim() !== ""
@@ -86,6 +93,9 @@ export function normalizeRecord(raw: {
     id: raw.id || `fb-${validDate.getTime()}-${Math.random().toString(36).slice(2, 7)}`,
     timestamp: iso,
     dateDisplay,
+    branchId,
+    clientPhone,
+    clientName,
     age: safeAge,
     ageGroup,
     barber,

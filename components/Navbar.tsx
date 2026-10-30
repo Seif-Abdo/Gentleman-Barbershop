@@ -4,46 +4,62 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "./LanguageContext";
-import { SITE_CONFIG } from "@/config/site";
-import { Scissors, Menu, X, Globe, MessageSquareQuote, Shield } from "lucide-react";
+import { useBranch } from "./BranchContext";
+import { Scissors, Menu, X, Globe, MessageSquareQuote, MapPin, ChevronDown } from "lucide-react";
 
 export function Navbar() {
-  const { locale, toggleLocale, dir, t } = useLanguage();
+  const { locale, toggleLocale, t } = useLanguage();
+  const { currentBranch, currentBranchId, setIsBranchModalOpen } = useBranch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   const navLinks = [
-    { href: "/", label: t("nav.home") },
-    { href: "/services", label: t("nav.services") },
-    { href: "/gallery", label: t("nav.gallery") },
-    { href: "/contact", label: t("nav.contact") },
+    { href: `/${currentBranchId}`, label: t("nav.home") },
+    { href: `/${currentBranchId}/services`, label: t("nav.services") },
+    { href: `/${currentBranchId}/gallery`, label: t("nav.gallery") },
+    { href: `/${currentBranchId}/contact`, label: t("nav.contact") },
   ];
 
   const isActive = (href: string) => {
-    if (href === "/" && pathname === "/") return true;
-    return href !== "/" && pathname.startsWith(href);
+    if (href === `/${currentBranchId}` && pathname === `/${currentBranchId}`) return true;
+    return href !== `/${currentBranchId}` && pathname.startsWith(href);
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-bg/90 border-b border-border/80 transition-all duration-300">
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-bg/90 border-b border-border/80 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light flex items-center justify-center p-[2px] shadow-gold-glow group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-bg rounded-full flex items-center justify-center">
-                <Scissors className="w-5 h-5 text-gold transform -rotate-45" />
+          {/* Brand Logo & Active Branch Indicator */}
+          <div className="flex items-center gap-3 sm:gap-6">
+            <Link href={`/${currentBranchId}`} className="flex items-center gap-3 group">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light flex items-center justify-center p-[2px] shadow-gold-glow group-hover:scale-105 transition-transform">
+                <div className="w-full h-full bg-bg rounded-full flex items-center justify-center">
+                  <Scissors className="w-5 h-5 text-gold transform -rotate-45" />
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif tracking-wider text-xl font-bold text-ivory group-hover:text-gold transition-colors">
-                GENTLEMAN
+              <div className="flex flex-col">
+                <span className="font-serif tracking-wider text-xl font-bold text-ivory group-hover:text-gold transition-colors">
+                  GENTLEMAN
+                </span>
+                <span className="text-[11px] text-ivory-muted tracking-widest uppercase">
+                  {locale === "ar" ? "صالون الحلاقة الراقي" : "Luxury Barbershop"}
+                </span>
+              </div>
+            </Link>
+
+            {/* Active Branch Selector Pill */}
+            <button
+              onClick={() => setIsBranchModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-2 border border-gold/40 hover:border-gold text-xs text-ivory hover:text-gold transition-all shadow-sm"
+              title="تغيير الفرع / Switch Branch"
+            >
+              <MapPin className="w-3.5 h-3.5 text-gold shrink-0" />
+              <span className="font-bold truncate max-w-[120px] sm:max-w-none">
+                {locale === "ar" ? currentBranch.nameAr : currentBranch.nameEn}
               </span>
-              <span className="text-[11px] text-ivory-muted tracking-widest uppercase">
-                {locale === "ar" ? "صالون الحلاقة الراقي" : "Luxury Barbershop"}
-              </span>
-            </div>
-          </Link>
+              <ChevronDown className="w-3 h-3 text-gold" />
+            </button>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
@@ -77,18 +93,9 @@ export function Navbar() {
               <span>{locale === "ar" ? "English" : "العربية"}</span>
             </button>
 
-            {/* Admin Link */}
+            {/* Feedback Wizard CTA (branch specific) */}
             <Link
-              href="/admin"
-              className="p-2 text-ivory-muted hover:text-gold transition-colors"
-              title={t("nav.admin")}
-            >
-              <Shield className="w-4 h-4" />
-            </Link>
-
-            {/* Feedback Wizard CTA */}
-            <Link
-              href="/feedback"
+              href={`/${currentBranchId}/feedback`}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-105"
             >
               <MessageSquareQuote className="w-4 h-4" />
@@ -118,6 +125,22 @@ export function Navbar() {
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-surface border-b border-border px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top">
+          <div className="pb-2 mb-2 border-b border-border flex justify-between items-center">
+            <span className="text-xs text-ivory-muted">
+              {locale === "ar" ? "الفرع الحالي:" : "Current Branch:"}
+            </span>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsBranchModalOpen(true);
+              }}
+              className="text-xs text-gold font-bold underline flex items-center gap-1"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{locale === "ar" ? currentBranch.nameAr : currentBranch.nameEn} (تغيير)</span>
+            </button>
+          </div>
+
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -132,30 +155,20 @@ export function Navbar() {
           ))}
           <div className="pt-4 border-t border-border flex flex-col gap-2">
             <Link
-              href="/feedback"
+              href={`/${currentBranchId}/feedback`}
               onClick={() => setMobileMenuOpen(false)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gold text-bg font-bold shadow-gold-glow text-center"
             >
               <MessageSquareQuote className="w-4 h-4" />
               <span>{t("nav.feedback")}</span>
             </Link>
-            <div className="flex justify-between items-center px-2 pt-2">
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-xs text-ivory-muted hover:text-gold flex items-center gap-1.5"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>{t("nav.admin")}</span>
-              </Link>
-              <Link
-                href="/feedback/qr"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-xs text-gold underline"
-              >
-                {t("nav.qr")}
-              </Link>
-            </div>
+            <Link
+              href={`/${currentBranchId}/feedback/qr`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xs text-gold underline text-center pt-2"
+            >
+              {t("nav.qr")}
+            </Link>
           </div>
         </div>
       )}
