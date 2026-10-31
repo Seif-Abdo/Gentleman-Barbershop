@@ -4,6 +4,9 @@ import { deleteFeedbacksByIds, deleteFeedbacksByCriteria } from "@/lib/db";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function verifyMasterAdmin() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get(AUTH_COOKIE_NAME);

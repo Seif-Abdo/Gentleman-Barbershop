@@ -5,6 +5,9 @@ import { aggregateDashboardData, FilterOptions } from "@/lib/aggregate";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();

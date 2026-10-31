@@ -112,9 +112,12 @@ export default function PortalDashboardPage() {
         dateRange,
         ageGroup,
         barber,
+        _t: Date.now().toString(),
       });
 
-      const res = await fetch(`/api/analytics?${params.toString()}`);
+      const res = await fetch(`/api/analytics?${params.toString()}`, {
+        cache: "no-store",
+      });
       if (res.status === 401) {
         router.push("/portal/login");
         return;

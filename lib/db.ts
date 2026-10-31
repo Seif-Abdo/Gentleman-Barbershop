@@ -378,16 +378,9 @@ async function ensureDbInitialized(): Promise<void> {
   try {
     const raw = await fs.readFile(FEEDBACKS_FILE, "utf-8");
     const parsed: NormalizedFeedback[] = JSON.parse(raw);
-    const hasBranches =
-      parsed.length >= 10 &&
-      parsed.some((f) => f.branchId === "nasr-city") &&
-      (parsed.some((f) => f.branchId === "abou-dawoud") || parsed.some((f) => f.branchId === "new-maadi"));
-    if (!hasBranches) {
-      throw new Error("Reseed multi-branch feedbacks");
-    }
 
     // Auto-migrate any legacy new-maadi feedbacks to abou-dawoud
-    if (parsed.some((f) => f.branchId === "new-maadi")) {
+    if (Array.isArray(parsed) && parsed.some((f) => f.branchId === "new-maadi")) {
       const migrated = parsed.map((f) => (f.branchId === "new-maadi" ? { ...f, branchId: "abou-dawoud" } : f));
       await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(migrated, null, 2), "utf-8");
     }
@@ -543,9 +536,7 @@ export async function insertFeedback(input: {
   const updated = [record, ...existing];
 
   try {
-    const tempFile = `${FEEDBACKS_FILE}.tmp`;
-    await fs.writeFile(tempFile, JSON.stringify(updated, null, 2), "utf-8");
-    await fs.rename(tempFile, FEEDBACKS_FILE);
+    await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(updated, null, 2), "utf-8");
   } catch (err) {
     console.error("[Database] Error writing feedback to disk:", err);
   }
@@ -561,9 +552,7 @@ export async function deleteFeedbacksByIds(ids: string[]): Promise<number> {
   const deletedCount = existing.length - filtered.length;
 
   if (deletedCount > 0) {
-    const tempFile = `${FEEDBACKS_FILE}.tmp`;
-    await fs.writeFile(tempFile, JSON.stringify(filtered, null, 2), "utf-8");
-    await fs.rename(tempFile, FEEDBACKS_FILE);
+    await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
   }
 
   return deletedCount;
@@ -613,9 +602,7 @@ export async function deleteFeedbacksByCriteria(criteria: {
   const deletedCount = existing.length - filtered.length;
 
   if (deletedCount > 0 || criteria.all || (isAllBranches && !hasDays)) {
-    const tempFile = `${FEEDBACKS_FILE}.tmp`;
-    await fs.writeFile(tempFile, JSON.stringify(filtered, null, 2), "utf-8");
-    await fs.rename(tempFile, FEEDBACKS_FILE);
+    await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
   }
 
   return deletedCount;
