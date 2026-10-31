@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from "react";
 import { useLanguage } from "@/components/LanguageContext";
 import { getServicesForBranch, ServiceItem } from "@/content/services";
 import { DEFAULT_BRANCHES, Branch } from "@/config/branches";
-import { Clock, Scissors, Sparkles, ShieldCheck } from "lucide-react";
+import { Clock, Scissors, Sparkles, ShieldCheck, MessageCircle } from "lucide-react";
 
 export default function BranchServicesPage({ params }: { params: Promise<{ branch: string }> }) {
   const resolvedParams = use(params);
@@ -134,10 +134,26 @@ export default function BranchServicesPage({ params }: { params: Promise<{ branc
                 </div>
               )}
 
-              <div className="flex items-center gap-1 text-[11px] text-gold/80">
-                <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-                <span>{locale === "ar" ? "أدوات معقمة" : "Sterilized Tools"}</span>
-              </div>
+              {branchSlug !== "zahraa-maadi" ? (
+                <a
+                  href={`https://wa.me/${branch.whatsapp}?text=${encodeURIComponent(
+                    locale === "ar"
+                      ? `مرحباً صالون جنتل مان (فرع ${branch.nameAr})، أود حجز خدمة: ${service.titleAr}`
+                      : `Hello Gentleman Barbershop (${branch.nameEn}), I would like to book: ${service.titleEn}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-surface-2 border border-gold/40 hover:border-gold text-gold hover:bg-gold hover:text-bg transition-all shadow-sm"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>{locale === "ar" ? "حجز بالواتساب" : "Book via WhatsApp"}</span>
+                </a>
+              ) : (
+                <div className="flex items-center gap-1 text-[11px] text-gold/80">
+                  <ShieldCheck className="w-3.5 h-3.5 text-gold" />
+                  <span>{locale === "ar" ? "أدوات معقمة" : "Sterilized Tools"}</span>
+                </div>
+              )}
             </div>
           </div>
         ))}

@@ -82,7 +82,13 @@ export default function BranchContactPage({ params }: { params: Promise<{ branch
               <Phone className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold text-ivory">
-              {locale === "ar" ? "الاتصال وخدمة العملاء" : "Direct Phone & WhatsApp"}
+              {locale === "ar"
+                ? branchSlug === "zahraa-maadi"
+                  ? "الاتصال وخدمة العملاء"
+                  : "الاتصال والحجز"
+                : branchSlug === "zahraa-maadi"
+                ? "Direct Phone & WhatsApp"
+                : "Phone & WhatsApp Booking"}
             </h3>
             <p className="text-sm text-ivory-muted font-mono" dir="ltr">
               {branch.phoneDisplay}
@@ -90,15 +96,27 @@ export default function BranchContactPage({ params }: { params: Promise<{ branch
             <a
               href={`https://wa.me/${branch.whatsapp}?text=${encodeURIComponent(
                 locale === "ar"
-                  ? `مرحباً صالون جنتل مان (فرع ${branch.nameAr})، أود الاستفسار عن الخدمات المتاحة.`
-                  : `Hello Gentleman Barbershop (${branch.nameEn}), I would like to inquire about available services.`
+                  ? branchSlug === "zahraa-maadi"
+                    ? `مرحباً صالون جنتل مان (فرع ${branch.nameAr})، أود الاستفسار عن الخدمات المتاحة.`
+                    : `مرحباً صالون جنتل مان (فرع ${branch.nameAr})، أود حجز موعد حلاقة.`
+                  : branchSlug === "zahraa-maadi"
+                  ? `Hello Gentleman Barbershop (${branch.nameEn}), I would like to inquire about available services.`
+                  : `Hello Gentleman Barbershop (${branch.nameEn}), I would like to book an appointment.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gold hover:bg-gold-light text-bg font-bold text-sm shadow-gold-glow transition-all"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>{locale === "ar" ? "تواصل فوري عبر الواتساب" : "Chat on WhatsApp"}</span>
+              <span>
+                {locale === "ar"
+                  ? branchSlug === "zahraa-maadi"
+                    ? "تواصل فوري عبر الواتساب"
+                    : "حجز موعد عبر الواتساب"
+                  : branchSlug === "zahraa-maadi"
+                  ? "Chat on WhatsApp"
+                  : "Book via WhatsApp"}
+              </span>
             </a>
           </div>
         </div>

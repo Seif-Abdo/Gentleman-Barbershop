@@ -284,10 +284,26 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
                     <span>{locale === "ar" ? "تصفيف احترافي" : "Expert Care"}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1 text-[11px] text-gold/80">
-                  <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-                  <span>{locale === "ar" ? "تعقيم طبي" : "Sterilized"}</span>
-                </div>
+                {branchSlug !== "zahraa-maadi" ? (
+                  <a
+                    href={`https://wa.me/${currentBranch.whatsapp}?text=${encodeURIComponent(
+                      locale === "ar"
+                        ? `مرحباً صالون جنتل مان (فرع ${currentBranch.nameAr})، أود حجز خدمة: ${service.titleAr}`
+                        : `Hello Gentleman Barbershop (${currentBranch.nameEn}), I would like to book: ${service.titleEn}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-gold hover:underline flex items-center gap-1"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>{locale === "ar" ? "حجز بالواتساب" : "Book via WhatsApp"}</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-1 text-[11px] text-gold/80">
+                    <ShieldCheck className="w-3.5 h-3.5 text-gold" />
+                    <span>{locale === "ar" ? "تعقيم طبي" : "Sterilized"}</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
