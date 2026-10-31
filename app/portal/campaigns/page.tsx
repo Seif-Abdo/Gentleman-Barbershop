@@ -282,7 +282,7 @@ export default function WhatsAppCampaignsPage() {
 
         {/* 1. Target Group & Audience Segmentation Box */}
         <div className="gold-card p-6 rounded-3xl space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-ivory flex items-center gap-2">
                 <Users className="w-5 h-5 text-gold" />
@@ -296,7 +296,7 @@ export default function WhatsAppCampaignsPage() {
             </div>
 
             {/* Dynamic Audience Counter */}
-            <div className="bg-surface-2 border border-gold/40 rounded-2xl px-5 py-3 text-right">
+            <div className="w-full sm:w-auto bg-surface-2 border border-gold/40 rounded-2xl px-5 py-3 text-right">
               <span className="text-[10px] text-ivory-muted uppercase font-semibold block">
                 {locale === "ar" ? "العملاء المطابقين" : "Target Reach"}
               </span>
@@ -519,7 +519,7 @@ export default function WhatsAppCampaignsPage() {
             </span>
 
             {/* Smartphone Frame */}
-            <div className="w-[320px] h-[550px] bg-[#111B21] border-4 border-[#2A2F32] rounded-[40px] shadow-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+            <div className="max-w-[320px] w-full h-[550px] bg-[#111B21] border-4 border-[#2A2F32] rounded-[40px] shadow-2xl p-4 flex flex-col justify-between relative overflow-hidden">
               {/* Speaker & camera notch */}
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-4 bg-[#2A2F32] rounded-full" />
 

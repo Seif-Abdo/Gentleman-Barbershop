@@ -283,7 +283,8 @@ export default function AdminsManagementPage() {
 
         {/* Admins Table / Cards */}
         <div className="bg-surface-elevated border border-border rounded-2xl overflow-hidden shadow-card">
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-surface-dark border-b border-border text-[11px] uppercase tracking-wider text-ivory-muted">
@@ -387,6 +388,79 @@ export default function AdminsManagementPage() {
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card List View (Visible on screens < md) */}
+          <div className="md:hidden divide-y divide-border/60">
+            {admins.map((adm) => {
+              const branch = branches.find((b) => b.id === adm.branchId);
+              const isCurrent = currentUser.username === adm.username;
+
+              return (
+                <div key={adm.id} className="p-4 space-y-3 bg-[#121212]/50">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gold/15 border border-gold/40 flex items-center justify-center text-gold font-bold text-sm">
+                        {adm.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-ivory text-sm">{adm.name}</span>
+                          {isCurrent && (
+                            <span className="text-[9px] bg-gold/20 text-gold px-2 py-0.5 rounded-full font-bold">
+                              {locale === "ar" ? "أنت" : "You"}
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-mono text-xs text-gold">@{adm.username}</span>
+                      </div>
+                    </div>
+
+                    {adm.role === "master_admin" ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-gold/15 text-gold border border-gold/40">
+                        <ShieldCheck className="w-3 h-3" />
+                        <span>{locale === "ar" ? "مدير عام" : "Master"}</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-surface-dark text-ivory-muted border border-border">
+                        <UserCheck className="w-3 h-3 text-blue-400" />
+                        <span>{locale === "ar" ? "مدير فرع" : "Branch"}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
+                    <div className="flex items-center gap-1 text-ivory-muted">
+                      <MapPin className="w-3.5 h-3.5 text-gold shrink-0" />
+                      <span>
+                        {adm.role === "master_admin"
+                          ? locale === "ar" ? "جميع الفروع" : "All Branches"
+                          : branch ? (locale === "ar" ? branch.nameAr : branch.nameEn) : adm.branchId}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEdit(adm)}
+                        className="px-3 py-1.5 rounded-lg bg-surface-dark border border-border hover:border-gold text-ivory text-xs font-semibold flex items-center gap-1"
+                      >
+                        <Edit2 className="w-3 h-3 text-gold" />
+                        <span>{locale === "ar" ? "تعديل" : "Edit"}</span>
+                      </button>
+                      {adm.id !== "admin-master" && (
+                        <button
+                          onClick={() => handleDelete(adm)}
+                          className="px-3 py-1.5 rounded-lg bg-red-950/20 border border-red-500/30 text-red-400 text-xs font-semibold flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>{locale === "ar" ? "حذف" : "Del"}</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

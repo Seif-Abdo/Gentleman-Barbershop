@@ -233,60 +233,62 @@ export default function PortalDashboardPage() {
         </div>
 
         {/* Global Filter Bar */}
-        <div className="gold-card p-4 rounded-2xl flex flex-wrap items-center gap-4">
+        <div className="gold-card p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 text-xs font-bold text-gold shrink-0">
             <Filter className="w-4 h-4" />
             <span>{locale === "ar" ? "الفلاتر:" : "Filters:"}</span>
           </div>
 
-          {/* Date Range */}
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
-          >
-            <option value="all">{locale === "ar" ? "كل الفترات" : "All Time"}</option>
-            <option value="today">{locale === "ar" ? "اليوم فقط" : "Today"}</option>
-            <option value="7d">{locale === "ar" ? "آخر 7 أيام" : "Last 7 Days"}</option>
-            <option value="30d">{locale === "ar" ? "آخر 30 يوم" : "Last 30 Days"}</option>
-            <option value="90d">{locale === "ar" ? "آخر 90 يوم" : "Last 90 Days"}</option>
-          </select>
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            {/* Date Range */}
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
+            >
+              <option value="all">{locale === "ar" ? "كل الفترات" : "All Time"}</option>
+              <option value="today">{locale === "ar" ? "اليوم فقط" : "Today"}</option>
+              <option value="7d">{locale === "ar" ? "آخر 7 أيام" : "Last 7 Days"}</option>
+              <option value="30d">{locale === "ar" ? "آخر 30 يوم" : "Last 30 Days"}</option>
+              <option value="90d">{locale === "ar" ? "آخر 90 يوم" : "Last 90 Days"}</option>
+            </select>
 
-          {/* Age Group */}
-          <select
-            value={ageGroup}
-            onChange={(e) => setAgeGroup(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
-          >
-            <option value="all">{locale === "ar" ? "جميع الفئات العمرية" : "All Age Groups"}</option>
-            <option value="young">{locale === "ar" ? "صغار (<18)" : "Young (<18)"}</option>
-            <option value="youths">{locale === "ar" ? "شباب (18–44)" : "Youths (18–44)"}</option>
-            <option value="elderly">{locale === "ar" ? "كبار السن (45+)" : "Elderly (45+)"}</option>
-            <option value="unknown">{locale === "ar" ? "غير محدد" : "Unknown"}</option>
-          </select>
+            {/* Age Group */}
+            <select
+              value={ageGroup}
+              onChange={(e) => setAgeGroup(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
+            >
+              <option value="all">{locale === "ar" ? "جميع الفئات العمرية" : "All Age Groups"}</option>
+              <option value="young">{locale === "ar" ? "صغار (<18)" : "Young (<18)"}</option>
+              <option value="youths">{locale === "ar" ? "شباب (18–44)" : "Youths (18–44)"}</option>
+              <option value="elderly">{locale === "ar" ? "كبار السن (45+)" : "Elderly (45+)"}</option>
+              <option value="unknown">{locale === "ar" ? "غير محدد" : "Unknown"}</option>
+            </select>
+          </div>
         </div>
 
         {/* KPI Cards */}
         {kpis && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="gold-card p-5 rounded-2xl space-y-1">
-              <span className="text-[11px] font-semibold text-ivory-muted uppercase">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            <div className="gold-card p-3.5 sm:p-5 rounded-2xl space-y-1">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-ivory-muted uppercase">
                 {locale === "ar" ? "إجمالي التقييمات" : "Responses"}
               </span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-gold font-serif">
+              <p className="text-xl sm:text-3xl font-extrabold text-gold font-serif">
                 {kpis.totalResponses}
               </p>
-              <span className="text-[10px] text-green-400 font-semibold">
+              <span className="text-[9px] sm:text-[10px] text-green-400 font-semibold">
                 +{kpis.periodChangePct}% {locale === "ar" ? "مقارنة بالفترة السابقة" : "vs prev"}
               </span>
             </div>
 
-            <div className="gold-card p-5 rounded-2xl space-y-1">
-              <span className="text-[11px] font-semibold text-ivory-muted uppercase">
+            <div className="gold-card p-3.5 sm:p-5 rounded-2xl space-y-1">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-ivory-muted uppercase">
                 {locale === "ar" ? "تقييم الصالون العام" : "Shop Rating"}
               </span>
               <div className="flex items-baseline gap-1">
-                <p className="text-2xl sm:text-3xl font-extrabold text-gold font-serif">
+                <p className="text-xl sm:text-3xl font-extrabold text-gold font-serif">
                   {kpis.avgShopRating}
                 </p>
                 <span className="text-xs text-ivory-muted">/ 5</span>
@@ -301,57 +303,57 @@ export default function PortalDashboardPage() {
               </div>
             </div>
 
-            <div className="gold-card p-5 rounded-2xl space-y-1">
-              <span className="text-[11px] font-semibold text-ivory-muted uppercase">
+            <div className="gold-card p-3.5 sm:p-5 rounded-2xl space-y-1">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-ivory-muted uppercase">
                 {locale === "ar" ? "متوسط تقييم الحلاقين" : "Barbers Rating"}
               </span>
               <div className="flex items-baseline gap-1">
-                <p className="text-2xl sm:text-3xl font-extrabold text-gold font-serif">
+                <p className="text-xl sm:text-3xl font-extrabold text-gold font-serif">
                   {kpis.avgBarberRating}
                 </p>
                 <span className="text-xs text-ivory-muted">/ 5</span>
               </div>
-              <span className="text-[10px] text-ivory-muted">
+              <span className="text-[9px] sm:text-[10px] text-ivory-muted">
                 {locale === "ar" ? "عبر حلاقي الفرع" : "Across staff"}
               </span>
             </div>
 
-            <div className="gold-card p-5 rounded-2xl space-y-1">
-              <span className="text-[11px] font-semibold text-ivory-muted uppercase">
+            <div className="gold-card p-3.5 sm:p-5 rounded-2xl space-y-1">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-ivory-muted uppercase">
                 {locale === "ar" ? "نسبة الرضا العام" : "Positive Share"}
               </span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-gold font-serif">
+              <p className="text-xl sm:text-3xl font-extrabold text-gold font-serif">
                 {kpis.positiveSharePct}%
               </p>
-              <span className="text-[10px] text-ivory-muted">
+              <span className="text-[9px] sm:text-[10px] text-ivory-muted">
                 {locale === "ar" ? "تقييم 4 أو 5 نجوم" : "Rated 4-5 stars"}
               </span>
             </div>
 
-            <div className="gold-card p-5 rounded-2xl space-y-1">
-              <span className="text-[11px] font-semibold text-ivory-muted uppercase">
+            <div className="gold-card p-3.5 sm:p-5 rounded-2xl space-y-1">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-ivory-muted uppercase">
                 {locale === "ar" ? "تنبيهات الملاحظات" : "Low Rating Alerts"}
               </span>
               <p
-                className={`text-2xl sm:text-3xl font-extrabold font-serif ${
+                className={`text-xl sm:text-3xl font-extrabold font-serif ${
                   kpis.lowRatingCount > 0 ? "text-red-400" : "text-gold"
                 }`}
               >
                 {kpis.lowRatingCount}
               </p>
-              <span className="text-[10px] text-ivory-muted">
+              <span className="text-[9px] sm:text-[10px] text-ivory-muted">
                 {locale === "ar" ? "نجمتين أو أقل" : "Rated <= 2 stars"}
               </span>
             </div>
 
-            <div className="gold-card p-5 rounded-2xl space-y-1">
-              <span className="text-[11px] font-semibold text-ivory-muted uppercase">
+            <div className="gold-card p-3.5 sm:p-5 rounded-2xl space-y-1">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-ivory-muted uppercase">
                 {locale === "ar" ? "الحلاق الأكثر تميزاً" : "Top Barber"}
               </span>
-              <p className="text-lg font-bold text-gold truncate">
+              <p className="text-base sm:text-lg font-bold text-gold truncate">
                 {kpis.bestBarber ? kpis.bestBarber.name : "—"}
               </p>
-              <span className="text-[10px] text-ivory-muted">
+              <span className="text-[9px] sm:text-[10px] text-ivory-muted">
                 {kpis.bestBarber ? `${kpis.bestBarber.avgRating} ★ (${kpis.bestBarber.count})` : "N/A"}
               </span>
             </div>

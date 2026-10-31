@@ -199,10 +199,10 @@ export default function BarbersManagementPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={handleAddNew}
-              className="px-5 py-2.5 bg-gold hover:bg-gold-light text-[#0B0B0B] font-bold text-sm rounded-xl shadow-gold-glow hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto justify-center px-5 py-2.5 bg-gold hover:bg-gold-light text-[#0B0B0B] font-bold text-sm rounded-xl shadow-gold-glow hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4 text-[#0B0B0B]" />
               <span>{locale === "ar" ? "إضافة حلاق جديد" : "Add New Barber"}</span>

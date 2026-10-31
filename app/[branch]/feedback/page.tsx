@@ -367,7 +367,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
               </div>
 
               {/* Star Rating Buttons */}
-              <div className="flex items-center justify-center gap-3 sm:gap-6 py-2">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-6 py-2">
                 {[1, 2, 3, 4, 5].map((stars) => (
                   <button
                     key={stars}
@@ -376,10 +376,10 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                       setBarberRating(stars);
                       setErrorMsg(null);
                     }}
-                    className="flex flex-col items-center gap-1 group focus:outline-none cursor-pointer"
+                    className="flex flex-col items-center gap-1 group focus:outline-none cursor-pointer p-1"
                   >
                     <Star
-                      className={`w-10 h-10 sm:w-12 sm:h-12 transition-transform group-hover:scale-115 ${
+                      className={`w-8 h-8 sm:w-12 sm:h-12 transition-transform group-hover:scale-115 ${
                         stars <= barberRating
                           ? "text-gold fill-gold drop-shadow-[0_0_12px_rgba(212,175,55,0.6)]"
                           : "text-border hover:text-gold/50"
@@ -469,7 +469,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 )}
               </div>
 
-              <div className="flex items-center justify-center gap-3 sm:gap-6 py-2">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-6 py-2">
                 {[1, 2, 3, 4, 5].map((stars) => (
                   <button
                     key={stars}
@@ -478,10 +478,10 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                       setShopRating(stars);
                       setErrorMsg(null);
                     }}
-                    className="flex flex-col items-center gap-1 group focus:outline-none cursor-pointer"
+                    className="flex flex-col items-center gap-1 group focus:outline-none cursor-pointer p-1"
                   >
                     <Star
-                      className={`w-10 h-10 sm:w-12 sm:h-12 transition-transform group-hover:scale-115 ${
+                      className={`w-8 h-8 sm:w-12 sm:h-12 transition-transform group-hover:scale-115 ${
                         stars <= shopRating
                           ? "text-gold fill-gold drop-shadow-[0_0_12px_rgba(212,175,55,0.6)]"
                           : "text-border hover:text-gold/50"

@@ -95,7 +95,7 @@ export default function BranchSelectorLandingPage() {
               <div
                 key={branch.id}
                 onClick={() => handleSelectBranch(branch.id)}
-                className={`gold-card rounded-3xl p-7 flex flex-col justify-between cursor-pointer group hover:border-gold hover:scale-[1.02] transition-all relative ${
+                className={`gold-card rounded-3xl p-5 sm:p-7 flex flex-col justify-between cursor-pointer group hover:border-gold hover:scale-[1.02] transition-all relative ${
                   isPrevious ? "border-gold shadow-gold-glow" : ""
                 }`}
               >

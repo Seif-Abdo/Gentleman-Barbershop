@@ -137,7 +137,7 @@ export default function PortalQrPage() {
 
             <button
               onClick={handleCopy}
-              className="px-4 py-2.5 rounded-xl bg-surface-2 border border-border hover:border-gold text-xs font-bold text-ivory hover:text-gold flex items-center gap-2 transition-all"
+              className="w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl bg-surface-2 border border-border hover:border-gold text-xs font-bold text-ivory hover:text-gold flex items-center gap-2 transition-all"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               <span>{copied ? (locale === "ar" ? "تم النسخ!" : "Copied!") : (locale === "ar" ? "نسخ الرابط" : "Copy Link")}</span>
@@ -145,7 +145,7 @@ export default function PortalQrPage() {
 
             <button
               onClick={handlePrint}
-              className="px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-[#0B0B0B] text-xs font-bold shadow-gold-glow flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+              className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-[#0B0B0B] text-xs font-bold shadow-gold-glow flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
             >
               <Printer className="w-4 h-4 text-[#0B0B0B]" />
               <span>{locale === "ar" ? "طباعة الكارت فوراً" : "Print Stand Card"}</span>
@@ -157,7 +157,7 @@ export default function PortalQrPage() {
         <div className="flex justify-center py-4">
           <div
             id="printable-qr-stand"
-            className="w-full max-w-sm sm:max-w-md bg-gradient-to-b from-[#141414] via-[#0E0E0E] to-[#141414] border-2 border-gold/70 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-7 text-center relative overflow-hidden"
+            className="w-full max-w-sm sm:max-w-md bg-gradient-to-b from-[#141414] via-[#0E0E0E] to-[#141414] border-2 border-gold/70 rounded-3xl p-5 sm:p-10 shadow-2xl space-y-7 text-center relative overflow-hidden"
           >
             {/* Elegant corner accents */}
             <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-gold" />

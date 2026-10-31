@@ -30,18 +30,18 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Brand Logo & Active Branch Indicator */}
-          <div className="flex items-center gap-3 sm:gap-6">
-            <Link href={`/${currentBranchId}`} className="flex items-center gap-3 group">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light flex items-center justify-center p-[2px] shadow-gold-glow group-hover:scale-105 transition-transform">
+          <div className="flex items-center gap-2 sm:gap-6">
+            <Link href={`/${currentBranchId}`} className="flex items-center gap-2.5 sm:gap-3 group">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light flex items-center justify-center p-[2px] shadow-gold-glow group-hover:scale-105 transition-transform">
                 <div className="w-full h-full bg-bg rounded-full flex items-center justify-center">
-                  <Scissors className="w-5 h-5 text-gold transform -rotate-45" />
+                  <Scissors className="w-4 h-4 sm:w-5 sm:h-5 text-gold transform -rotate-45" />
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="font-serif tracking-wider text-xl font-bold text-ivory group-hover:text-gold transition-colors">
+                <span className="font-serif tracking-wider text-lg sm:text-xl font-bold text-ivory group-hover:text-gold transition-colors">
                   GENTLEMAN
                 </span>
-                <span className="text-[11px] text-ivory-muted tracking-widest uppercase">
+                <span className="text-[10px] sm:text-[11px] text-ivory-muted tracking-widest uppercase">
                   {locale === "ar" ? "صالون الحلاقة الراقي" : "Luxury Barbershop"}
                 </span>
               </div>
@@ -50,11 +50,11 @@ export function Navbar() {
             {/* Active Branch Selector Pill */}
             <button
               onClick={() => setIsBranchModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-2 border border-gold/40 hover:border-gold text-xs text-ivory hover:text-gold transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-surface-2 border border-gold/40 hover:border-gold text-[11px] sm:text-xs text-ivory hover:text-gold transition-all shadow-sm"
               title="تغيير الفرع / Switch Branch"
             >
-              <MapPin className="w-3.5 h-3.5 text-gold shrink-0" />
-              <span className="font-bold truncate max-w-[120px] sm:max-w-none">
+              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gold shrink-0" />
+              <span className="font-bold truncate max-w-[85px] sm:max-w-none">
                 {locale === "ar" ? currentBranch.nameAr : currentBranch.nameEn}
               </span>
               <ChevronDown className="w-3 h-3 text-gold" />
