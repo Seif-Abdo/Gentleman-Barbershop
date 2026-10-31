@@ -169,7 +169,8 @@ export const NASR_CITY_SERVICES: ServiceItem[] = [
 export const BRANCH_SERVICES_MAP: Record<string, ServiceItem[]> = {
   "zahraa-maadi": ZAHRAA_SERVICES,
   "nasr-city": NASR_CITY_SERVICES,
-  "new-maadi": NASR_CITY_SERVICES, // Nasr City (Abou Dawoud El Zahery) has the same updated services list
+  "abou-dawoud": NASR_CITY_SERVICES, // Nasr City (Abou Dawoud El Zahery)
+  "new-maadi": NASR_CITY_SERVICES, // Legacy alias
 };
 
 export function getServicesForBranch(branchId: string): ServiceItem[] {

@@ -30,24 +30,25 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
   const ArrowIcon = dir === "rtl" ? ArrowLeft : ArrowRight;
 
   const [branch, setBranch] = useState<Branch | null>(
-    DEFAULT_BRANCHES.find((b) => b.id === branchSlug) || null
+    DEFAULT_BRANCHES.find((b) => b.id === branchSlug || (branchSlug === "new-maadi" && b.id === "abou-dawoud")) || null
   );
   const [barbers, setBarbers] = useState<Barber[]>(getBarbersByBranch(branchSlug));
 
   useEffect(() => {
+    const normalizedSlug = branchSlug === "new-maadi" ? "abou-dawoud" : branchSlug;
     // Sync current branch selection to storage
-    localStorage.setItem("gentleman_branch", branchSlug);
+    localStorage.setItem("gentleman_branch", normalizedSlug);
 
     // Fetch dynamic branch and barbers from API
     fetch(`/api/branches`)
       .then((res) => res.json())
       .then((list: Branch[]) => {
-        const found = list.find((b) => b.id === branchSlug);
+        const found = list.find((b) => b.id === normalizedSlug);
         if (found) setBranch(found);
       })
       .catch(() => {});
 
-    fetch(`/api/barbers?branchId=${branchSlug}`)
+    fetch(`/api/barbers?branchId=${normalizedSlug}`)
       .then((res) => res.json())
       .then((list: Barber[]) => {
         if (Array.isArray(list) && list.length > 0) {
@@ -59,7 +60,7 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
 
   if (!branch) {
     // If not found in defaults, check if valid slug
-    const matched = DEFAULT_BRANCHES.find((b) => b.id === branchSlug);
+    const matched = DEFAULT_BRANCHES.find((b) => b.id === branchSlug || (branchSlug === "new-maadi" && b.id === "abou-dawoud"));
     if (!matched) return notFound();
   }
 

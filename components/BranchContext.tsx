@@ -47,14 +47,22 @@ export function BranchProvider({ children }: { children: React.ReactNode }) {
     const segments = pathname.split("/").filter(Boolean);
     const branchCandidate = segments[0];
 
+    // If someone visits legacy /new-maadi route, seamlessly redirect to /abou-dawoud
+    if (branchCandidate === "new-maadi") {
+      const rest = segments.slice(1).join("/");
+      router.replace(`/abou-dawoud${rest ? `/${rest}` : ""}`);
+      return;
+    }
+
     const matched = branches.find((b) => b.id === branchCandidate);
     if (matched) {
       setCurrentBranchId(matched.id);
       localStorage.setItem("gentleman_branch", matched.id);
     } else {
       const saved = localStorage.getItem("gentleman_branch");
-      if (saved && branches.some((b) => b.id === saved)) {
-        setCurrentBranchId(saved);
+      const normalizedSaved = saved === "new-maadi" ? "abou-dawoud" : saved;
+      if (normalizedSaved && branches.some((b) => b.id === normalizedSaved)) {
+        setCurrentBranchId(normalizedSaved);
       }
     }
   }, [pathname, branches]);

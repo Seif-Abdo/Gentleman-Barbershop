@@ -27,12 +27,12 @@
     "createdAt": "2026-10-31T12:11:16.705Z"
   },
   {
-    "id": "admin-newmaadi",
-    "username": "admin_newmaadi",
+    "id": "admin-aboudawoud",
+    "username": "admin_aboudawoud",
     "name": "مدير فرع مدينة نصر (أبوداود الظاهري)",
     "role": "branch_admin",
-    "branchId": "new-maadi",
-    "password": "maadi2026",
+    "branchId": "abou-dawoud",
+    "password": "dawoud2026",
     "createdAt": "2026-10-31T12:11:16.705Z"
   }
 ]

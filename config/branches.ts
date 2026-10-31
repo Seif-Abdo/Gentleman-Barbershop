@@ -1,5 +1,5 @@
 export interface Branch {
-  id: string; // url slug: 'zahraa-maadi', 'nasr-city', 'new-maadi'
+  id: string; // url slug: 'zahraa-maadi', 'nasr-city', 'abou-dawoud'
   nameAr: string;
   nameEn: string;
   taglineAr: string;
@@ -52,7 +52,7 @@ export const DEFAULT_BRANCHES: Branch[] = [
     isActive: true,
   },
   {
-    id: "new-maadi",
+    id: "abou-dawoud",
     nameAr: "مدينة نصر (أبوداود الظاهري)",
     nameEn: "Nasr City (Abou Dawoud El Zahery)",
     taglineAr: "فرع أبو داود الظاهري · تميز وفخامة متكاملة",

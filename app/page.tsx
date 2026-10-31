@@ -39,7 +39,7 @@ export default function BranchSelectorLandingPage() {
   const getBarberCount = (branchId: string) => {
     if (branchId === "zahraa-maadi") return 6;
     if (branchId === "nasr-city") return 5;
-    if (branchId === "new-maadi") return 3;
+    if (branchId === "abou-dawoud" || branchId === "new-maadi") return 3;
     return 4;
   };
 

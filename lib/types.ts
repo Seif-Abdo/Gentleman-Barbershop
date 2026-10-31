@@ -6,7 +6,7 @@ export interface NormalizedFeedback {
   id: string;
   timestamp: string; // ISO string
   dateDisplay: string; // e.g. 2026-10-30
-  branchId: string; // 'zahraa-maadi' | 'nasr-city' | 'new-maadi'
+  branchId: string; // 'zahraa-maadi' | 'nasr-city' | 'abou-dawoud'
   clientPhone?: string; // Captured for loyalty & WhatsApp campaigns
   clientName?: string;
   age: number | null;

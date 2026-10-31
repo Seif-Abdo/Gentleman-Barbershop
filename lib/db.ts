@@ -89,12 +89,12 @@ const DEFAULT_ADMINS: AdminUser[] = [
     createdAt: new Date().toISOString(),
   },
   {
-    id: "admin-newmaadi",
-    username: "admin_newmaadi",
+    id: "admin-aboudawoud",
+    username: "admin_aboudawoud",
     name: "مدير فرع مدينة نصر (أبوداود الظاهري)",
     role: "branch_admin",
-    branchId: "new-maadi",
-    password: "maadi2026",
+    branchId: "abou-dawoud",
+    password: "dawoud2026",
     createdAt: new Date().toISOString(),
   },
 ];
@@ -249,9 +249,9 @@ const SEED_FEEDBACKS = [
     suggestion: "عايزين فرع في التجمع.",
   },
 
-  // Branch 3: Nasr City (أبوداود الظاهري / new-maadi)
+  // Branch 3: Nasr City (أبوداود الظاهري / abou-dawoud)
   {
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     clientName: "شريف النجار",
     clientPhone: "+201077665544",
     age: 36,
@@ -263,7 +263,7 @@ const SEED_FEEDBACKS = [
     suggestion: "توفير مساحات انتظار خارجية.",
   },
   {
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     clientName: "ياسر رضوان",
     clientPhone: "+201199887755",
     age: 51,
@@ -275,7 +275,7 @@ const SEED_FEEDBACKS = [
     suggestion: "كل شيء ممتاز ربنا يوفقكم.",
   },
   {
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     clientName: "زياد الشريف",
     clientPhone: "+201211335577",
     age: 22,
@@ -287,7 +287,7 @@ const SEED_FEEDBACKS = [
     suggestion: "توفير باقات اشتراك شهرية.",
   },
   {
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     clientName: "كريم بدوي",
     clientPhone: "+201066554433",
     age: 29,
@@ -299,7 +299,7 @@ const SEED_FEEDBACKS = [
     suggestion: "كود خصم للزيارة التانية.",
   },
   {
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     clientName: "هشام صبري",
     clientPhone: "+201188776655",
     age: 44,
@@ -381,9 +381,15 @@ async function ensureDbInitialized(): Promise<void> {
     const hasBranches =
       parsed.length >= 10 &&
       parsed.some((f) => f.branchId === "nasr-city") &&
-      parsed.some((f) => f.branchId === "new-maadi");
+      (parsed.some((f) => f.branchId === "abou-dawoud") || parsed.some((f) => f.branchId === "new-maadi"));
     if (!hasBranches) {
       throw new Error("Reseed multi-branch feedbacks");
+    }
+
+    // Auto-migrate any legacy new-maadi feedbacks to abou-dawoud
+    if (parsed.some((f) => f.branchId === "new-maadi")) {
+      const migrated = parsed.map((f) => (f.branchId === "new-maadi" ? { ...f, branchId: "abou-dawoud" } : f));
+      await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(migrated, null, 2), "utf-8");
     }
   } catch {
     const now = Date.now();
@@ -408,6 +414,43 @@ async function ensureDbInitialized(): Promise<void> {
     });
     await fs.writeFile(FEEDBACKS_FILE, JSON.stringify(initial, null, 2), "utf-8");
   }
+
+  // Automatic Migration for any remaining legacy "new-maadi" records in Branches, Barbers, and Admins files
+  try {
+    const rawB = await fs.readFile(BRANCHES_FILE, "utf-8");
+    if (rawB.includes("new-maadi")) {
+      const branches = JSON.parse(rawB);
+      const migrated = branches.map((b: any) => (b.id === "new-maadi" ? { ...b, id: "abou-dawoud" } : b));
+      await fs.writeFile(BRANCHES_FILE, JSON.stringify(migrated, null, 2), "utf-8");
+    }
+  } catch {}
+
+  try {
+    const rawBarbers = await fs.readFile(BARBERS_FILE, "utf-8");
+    if (rawBarbers.includes("new-maadi")) {
+      const barbers = JSON.parse(rawBarbers);
+      const migrated = barbers.map((b: any) => (b.branchId === "new-maadi" ? { ...b, branchId: "abou-dawoud" } : b));
+      await fs.writeFile(BARBERS_FILE, JSON.stringify(migrated, null, 2), "utf-8");
+    }
+  } catch {}
+
+  try {
+    const rawAdmins = await fs.readFile(ADMINS_FILE, "utf-8");
+    if (rawAdmins.includes("new-maadi")) {
+      const admins = JSON.parse(rawAdmins);
+      const migrated = admins.map((a: any) =>
+        a.branchId === "new-maadi"
+          ? {
+              ...a,
+              branchId: "abou-dawoud",
+              id: a.id === "admin-newmaadi" ? "admin-aboudawoud" : a.id,
+              username: a.username === "admin_newmaadi" ? "admin_aboudawoud" : a.username,
+            }
+          : a
+      );
+      await fs.writeFile(ADMINS_FILE, JSON.stringify(migrated, null, 2), "utf-8");
+    }
+  } catch {}
 }
 
 // ================= BRANCHES =================

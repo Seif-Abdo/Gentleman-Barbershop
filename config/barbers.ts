@@ -152,7 +152,7 @@ export const DEFAULT_BARBERS: Barber[] = [
   // --- Branch 3: Nasr City (Abou Dawoud El Zahery) ---
   {
     id: "ahmed-sayed",
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     nameAr: "احمد سيد",
     nameEn: "Ahmed Sayed",
     titleAr: "كبير حلاقي فرع مدينة نصر (أبوداود الظاهري)",
@@ -164,7 +164,7 @@ export const DEFAULT_BARBERS: Barber[] = [
   },
   {
     id: "khaled-sayed",
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     nameAr: "خالد سيد",
     nameEn: "Khaled Sayed",
     titleAr: "خبير تدريج الفيد والموس الساخن",
@@ -176,7 +176,7 @@ export const DEFAULT_BARBERS: Barber[] = [
   },
   {
     id: "abdullah",
-    branchId: "new-maadi",
+    branchId: "abou-dawoud",
     nameAr: "عبدالله",
     nameEn: "Abdullah",
     titleAr: "أخصائي التصفيف والعناية بالبشرة",
@@ -190,5 +190,6 @@ export const DEFAULT_BARBERS: Barber[] = [
 
 // Helper to filter barbers by branch
 export function getBarbersByBranch(branchId: string, barbers: Barber[] = DEFAULT_BARBERS): Barber[] {
-  return barbers.filter((b) => b.branchId === branchId && b.isActive);
+  const normalizedId = branchId === "new-maadi" ? "abou-dawoud" : branchId;
+  return barbers.filter((b) => (b.branchId === normalizedId || (normalizedId === "abou-dawoud" && b.branchId === "new-maadi")) && b.isActive);
 }
