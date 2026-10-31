@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAllBarbers, saveBarbers } from "@/lib/db";
+import { getAllBarbers, saveBarbers, logAdminAction } from "@/lib/db";
 import { Barber } from "@/config/barbers";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
@@ -57,6 +57,50 @@ export async function POST(req: Request) {
     }
 
     await saveBarbers(barbers);
+
+    // Audit Logging
+    const actionMap: Record<string, { act: any; titleAr: string; titleEn: string; descAr: string; descEn: string }> = {
+      add: {
+        act: "CREATE",
+        titleAr: "إضافة حلاق جديد للصالون",
+        titleEn: "Barber Added",
+        descAr: `تمت إضافة الحلاق (${barber.nameAr}) إلى فرع (${barber.branchId}).`,
+        descEn: `Added barber (${barber.nameEn || barber.nameAr}) to branch (${barber.branchId}).`,
+      },
+      update: {
+        act: "UPDATE",
+        titleAr: "تعديل بيانات حلاق",
+        titleEn: "Barber Updated",
+        descAr: `تم تحديث بيانات الحلاق (${barber.nameAr}).`,
+        descEn: `Updated details for barber (${barber.nameEn || barber.nameAr}).`,
+      },
+      delete: {
+        act: "DELETE",
+        titleAr: "حذف حلاق من الصالون",
+        titleEn: "Barber Deleted",
+        descAr: `تم حذف الحلاق (${barber.nameAr || barber.id}) من النظام.`,
+        descEn: `Deleted barber (${barber.nameEn || barber.nameAr || barber.id}) from system.`,
+      },
+    };
+
+    const logInfo = actionMap[action];
+    if (logInfo) {
+      await logAdminAction({
+        userId: session.id,
+        username: session.username,
+        userName: session.name,
+        userRole: session.role,
+        branchId: barber.branchId,
+        category: "barbers",
+        action: logInfo.act,
+        titleAr: logInfo.titleAr,
+        titleEn: logInfo.titleEn,
+        detailsAr: logInfo.descAr,
+        detailsEn: logInfo.descEn,
+        metadata: { barberId: barber.id, action },
+      });
+    }
+
     return NextResponse.json({ success: true, barbers });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

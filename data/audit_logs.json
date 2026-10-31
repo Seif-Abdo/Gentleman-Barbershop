@@ -1,0 +1,53 @@
+[
+  {
+    "id": "log-1793484779835-5ty4",
+    "timestamp": "2026-10-31T22:12:59.835Z",
+    "dateDisplay": "2026-11-01",
+    "timeDisplay": "00:12",
+    "userId": "admin-master",
+    "username": "master",
+    "userName": "مدير عام الصالون (Owner)",
+    "userRole": "master_admin",
+    "branchId": "all",
+    "category": "auth",
+    "action": "LOGIN",
+    "titleAr": "تسجيل دخول إلى لوحة الإدارة",
+    "titleEn": "Admin Portal Login",
+    "detailsAr": "قام (مدير عام الصالون (Owner)) بتسجيل الدخول كـ (مدير عام).",
+    "detailsEn": "User (مدير عام الصالون (Owner)) logged in successfully as (master_admin)."
+  },
+  {
+    "id": "log-seed-1",
+    "timestamp": "2026-10-31T17:12:59.816Z",
+    "dateDisplay": "2026-10-31",
+    "timeDisplay": "18:45",
+    "userId": "admin-master",
+    "username": "master",
+    "userName": "مدير عام الصالون (Owner)",
+    "userRole": "master_admin",
+    "branchId": "all",
+    "category": "auth",
+    "action": "LOGIN",
+    "titleAr": "تسجيل دخول إلى لوحة الإدارة",
+    "titleEn": "Portal Login",
+    "detailsAr": "تسجيل دخول ناجح للمدير العام.",
+    "detailsEn": "Successful login by Master Admin."
+  },
+  {
+    "id": "log-seed-2",
+    "timestamp": "2026-10-31T19:12:59.828Z",
+    "dateDisplay": "2026-10-31",
+    "timeDisplay": "20:30",
+    "userId": "admin-master",
+    "username": "master",
+    "userName": "مدير عام الصالون (Owner)",
+    "userRole": "master_admin",
+    "branchId": "zahraa-maadi",
+    "category": "branches",
+    "action": "UPDATE",
+    "titleAr": "تحديث بيانات الفرع",
+    "titleEn": "Branch Updated",
+    "detailsAr": "تحديث مواعيد العمل والموقع الجغرافي لفرع زهراء المعادي.",
+    "detailsEn": "Updated working hours and location for Zahraa El Maadi branch."
+  }
+]

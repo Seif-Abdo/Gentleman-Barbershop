@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { deleteFeedbacksByIds, deleteFeedbacksByCriteria } from "@/lib/db";
+import { deleteFeedbacksByIds, deleteFeedbacksByCriteria, logAdminAction } from "@/lib/db";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
 
@@ -57,6 +57,41 @@ export async function DELETE(req: Request) {
         { error: "نوع طلب الحذف غير صالح." },
         { status: 400 }
       );
+    }
+
+    if (deletedCount > 0) {
+      if (type === "ids") {
+        await logAdminAction({
+          userId: master.id,
+          username: master.username,
+          userName: master.name,
+          userRole: master.role,
+          category: "feedback",
+          action: "DELETE",
+          titleAr: "حذف تقييمات العملاء المحددة",
+          titleEn: "Delete Selected Customer Feedbacks",
+          detailsAr: `قام بحذف ${deletedCount} سجل من آراء وتقييمات العملاء.`,
+          detailsEn: `Deleted ${deletedCount} customer feedback record(s).`,
+          metadata: { ids, count: deletedCount },
+        });
+      } else {
+        await logAdminAction({
+          userId: master.id,
+          username: master.username,
+          userName: master.name,
+          userRole: master.role,
+          branchId: branchId || undefined,
+          category: "feedback",
+          action: "CLEANUP",
+          titleAr: all ? "حذف شامل لكافة آراء العملاء" : "تنظيف وفلترة سجلات العملاء",
+          titleEn: all ? "Total Customer Feedbacks Wipeout" : "Filtered Feedbacks Cleanup",
+          detailsAr: all
+            ? `قام بحذف كافة سجلات العملاء بالكامل (تفريغ شامل: ${deletedCount} سجل).`
+            : `تنظيف سجلات فرع (${branchId || "جميع الفروع"}) للفترة (${olderThanDays ? `الأقدم من ${olderThanDays} يوم` : "كل السجلات"})، تم حذف ${deletedCount} سجل.`,
+          detailsEn: `Purged ${deletedCount} feedback records (branch: ${branchId || "all"}, olderThan: ${olderThanDays || "all"}).`,
+          metadata: { branchId, olderThanDays, all, count: deletedCount },
+        });
+      }
     }
 
     return NextResponse.json({

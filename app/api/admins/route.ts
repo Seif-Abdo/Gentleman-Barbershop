@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAllAdmins, saveAdmins } from "@/lib/db";
+import { getAllAdmins, saveAdmins, logAdminAction } from "@/lib/db";
 import { AdminUser } from "@/lib/types";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
@@ -82,6 +82,50 @@ export async function POST(req: Request) {
     }
 
     await saveAdmins(admins);
+
+    // Audit Logging
+    const actionMap: Record<string, { act: any; titleAr: string; titleEn: string; descAr: string; descEn: string }> = {
+      add: {
+        act: "CREATE",
+        titleAr: "إنشاء حساب مشرف جديد",
+        titleEn: "Admin Account Created",
+        descAr: `تم إنشاء حساب مشرف جديد باسم (${admin.username}) وصلاحية (${admin.role === "master_admin" ? "مدير عام" : "مدير فرع"}).`,
+        descEn: `Created new admin account (${admin.username}) with role (${admin.role}).`,
+      },
+      update: {
+        act: "UPDATE",
+        titleAr: "تعديل حساب مشرف",
+        titleEn: "Admin Account Updated",
+        descAr: `تم تعديل بيانات وصلاحيات المشرف (${admin.username || admin.id}).`,
+        descEn: `Updated details for admin account (${admin.username || admin.id}).`,
+      },
+      delete: {
+        act: "DELETE",
+        titleAr: "حذف حساب مشرف",
+        titleEn: "Admin Account Deleted",
+        descAr: `تم حذف حساب المشرف (${admin.username || admin.id}) من النظام.`,
+        descEn: `Deleted admin account (${admin.username || admin.id}).`,
+      },
+    };
+
+    const logInfo = actionMap[action];
+    if (logInfo) {
+      await logAdminAction({
+        userId: master.id,
+        username: master.username,
+        userName: master.name,
+        userRole: master.role,
+        branchId: admin.branchId,
+        category: "admins",
+        action: logInfo.act,
+        titleAr: logInfo.titleAr,
+        titleEn: logInfo.titleEn,
+        detailsAr: logInfo.descAr,
+        detailsEn: logInfo.descEn,
+        metadata: { targetAdminId: admin.id, action },
+      });
+    }
+
     return NextResponse.json({ success: true, message: "Admins updated successfully" });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

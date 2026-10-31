@@ -2,6 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {
   AdminUser,
+  AuditLog,
+  AuditLogAction,
+  AuditLogCategory,
   NormalizedFeedback,
   WhatsAppCampaign,
   WhatsAppSettings,
@@ -18,6 +21,7 @@ const BARBERS_FILE = path.join(DATA_DIR, "barbers.json");
 const ADMINS_FILE = path.join(DATA_DIR, "admins.json");
 const CAMPAIGNS_FILE = path.join(DATA_DIR, "campaigns.json");
 const WA_SETTINGS_FILE = path.join(DATA_DIR, "whatsapp_settings.json");
+const AUDIT_LOGS_FILE = path.join(DATA_DIR, "audit_logs.json");
 
 // Default Pre-approved WhatsApp Templates
 export const DEFAULT_WA_TEMPLATES: WhatsAppTemplate[] = [
@@ -444,6 +448,49 @@ async function ensureDbInitialized(): Promise<void> {
       await fs.writeFile(ADMINS_FILE, JSON.stringify(migrated, null, 2), "utf-8");
     }
   } catch {}
+
+  // 7. Audit Logs
+  try {
+    await fs.access(AUDIT_LOGS_FILE);
+  } catch {
+    const initialLogs: AuditLog[] = [
+      {
+        id: "log-seed-1",
+        timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
+        dateDisplay: new Date(Date.now() - 3600000 * 5).toLocaleDateString("en-CA"),
+        timeDisplay: "18:45",
+        userId: "admin-master",
+        username: "master",
+        userName: "مدير عام الصالون (Owner)",
+        userRole: "master_admin",
+        branchId: "all",
+        category: "auth",
+        action: "LOGIN",
+        titleAr: "تسجيل دخول إلى لوحة الإدارة",
+        titleEn: "Portal Login",
+        detailsAr: "تسجيل دخول ناجح للمدير العام.",
+        detailsEn: "Successful login by Master Admin.",
+      },
+      {
+        id: "log-seed-2",
+        timestamp: new Date(Date.now() - 3600000 * 3).toISOString(),
+        dateDisplay: new Date(Date.now() - 3600000 * 3).toLocaleDateString("en-CA"),
+        timeDisplay: "20:30",
+        userId: "admin-master",
+        username: "master",
+        userName: "مدير عام الصالون (Owner)",
+        userRole: "master_admin",
+        branchId: "zahraa-maadi",
+        category: "branches",
+        action: "UPDATE",
+        titleAr: "تحديث بيانات الفرع",
+        titleEn: "Branch Updated",
+        detailsAr: "تحديث مواعيد العمل والموقع الجغرافي لفرع زهراء المعادي.",
+        detailsEn: "Updated working hours and location for Zahraa El Maadi branch.",
+      },
+    ];
+    await fs.writeFile(AUDIT_LOGS_FILE, JSON.stringify(initialLogs, null, 2), "utf-8");
+  }
 }
 
 // ================= BRANCHES =================
@@ -670,4 +717,61 @@ export async function getAllCampaigns(): Promise<WhatsAppCampaign[]> {
 export async function saveCampaigns(campaigns: WhatsAppCampaign[]): Promise<void> {
   await ensureDbInitialized();
   await fs.writeFile(CAMPAIGNS_FILE, JSON.stringify(campaigns, null, 2), "utf-8");
+}
+
+// ================= AUDIT LOGS =================
+export async function getAllAuditLogs(): Promise<AuditLog[]> {
+  await ensureDbInitialized();
+  try {
+    const raw = await fs.readFile(AUDIT_LOGS_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export async function logAdminAction(entry: {
+  userId: string;
+  username: string;
+  userName: string;
+  userRole: "master_admin" | "branch_admin";
+  branchId?: string;
+  category: AuditLogCategory;
+  action: AuditLogAction;
+  titleAr: string;
+  titleEn: string;
+  detailsAr: string;
+  detailsEn: string;
+  metadata?: Record<string, any>;
+}): Promise<AuditLog> {
+  await ensureDbInitialized();
+  const existing = await getAllAuditLogs();
+  const now = new Date();
+
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+
+  const newLog: AuditLog = {
+    id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    timestamp: now.toISOString(),
+    dateDisplay: now.toLocaleDateString("en-CA"),
+    timeDisplay: `${hours}:${minutes}`,
+    ...entry,
+  };
+
+  const updated = [newLog, ...existing];
+  const trimmed = updated.slice(0, 1000); // Keep latest 1000 logs
+
+  try {
+    await fs.writeFile(AUDIT_LOGS_FILE, JSON.stringify(trimmed, null, 2), "utf-8");
+  } catch (err) {
+    console.error("[Database] Error writing audit log:", err);
+  }
+
+  return newLog;
+}
+
+export async function clearAuditLogs(): Promise<void> {
+  await ensureDbInitialized();
+  await fs.writeFile(AUDIT_LOGS_FILE, JSON.stringify([], null, 2), "utf-8");
 }

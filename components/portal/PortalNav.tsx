@@ -20,6 +20,7 @@ import {
   X,
   Globe,
   User,
+  History,
 } from "lucide-react";
 import { Branch } from "@/config/branches";
 
@@ -97,6 +98,13 @@ export function PortalNav({
       labelEn: "In-Shop QR Stand",
       icon: QrCode,
       roles: ["master_admin", "branch_admin"],
+    },
+    {
+      href: "/portal/logs",
+      labelAr: "سجل العمليات",
+      labelEn: "Audit Logs",
+      icon: History,
+      roles: ["master_admin"],
     },
   ];
 

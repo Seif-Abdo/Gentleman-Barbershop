@@ -147,3 +147,41 @@ export interface WhatsAppSettings {
   testRecipientNumber: string;
   isEnabled: boolean;
 }
+
+// ================= AUDIT LOGS =================
+export type AuditLogCategory =
+  | "feedback"
+  | "barbers"
+  | "branches"
+  | "admins"
+  | "campaigns"
+  | "settings"
+  | "auth";
+
+export type AuditLogAction =
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "CLEANUP"
+  | "STATUS_CHANGE"
+  | "LOGIN";
+
+export interface AuditLog {
+  id: string;
+  timestamp: string; // ISO string
+  dateDisplay: string;
+  timeDisplay: string;
+  userId: string;
+  username: string;
+  userName: string;
+  userRole: "master_admin" | "branch_admin";
+  branchId?: string;
+  category: AuditLogCategory;
+  action: AuditLogAction;
+  titleAr: string;
+  titleEn: string;
+  detailsAr: string;
+  detailsEn: string;
+  metadata?: Record<string, any>;
+}
+

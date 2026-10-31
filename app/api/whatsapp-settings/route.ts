@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getWhatsAppSettings, saveWhatsAppSettings } from "@/lib/db";
+import { getWhatsAppSettings, saveWhatsAppSettings, logAdminAction } from "@/lib/db";
 import { WhatsAppSettings } from "@/lib/types";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
@@ -42,6 +42,19 @@ export async function POST(req: Request) {
       accessToken: String(body.accessToken || "").trim(),
       testRecipientNumber: String(body.testRecipientNumber || "").trim(),
       isEnabled: Boolean(body.isEnabled),
+    });
+
+    await logAdminAction({
+      userId: master.id,
+      username: master.username,
+      userName: master.name,
+      userRole: master.role,
+      category: "settings",
+      action: "UPDATE",
+      titleAr: "تحديث إعدادات واتساب للأعمال",
+      titleEn: "WhatsApp Settings Updated",
+      detailsAr: `تم تحديث بيانات ربط واتساب وتفعيل الحالة: ${body.isEnabled ? "مفعّل" : "معطّل"}.`,
+      detailsEn: `Updated WhatsApp API integration settings (Status: ${body.isEnabled ? "Enabled" : "Disabled"}).`,
     });
 
     return NextResponse.json({

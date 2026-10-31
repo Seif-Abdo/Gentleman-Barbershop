@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verifyAdminCredentials } from "@/lib/db";
+import { verifyAdminCredentials, logAdminAction } from "@/lib/db";
 
 const AUTH_COOKIE_NAME = "gentleman_portal_session";
 
@@ -39,6 +39,23 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     });
+
+    // Audit Log Login
+    try {
+      await logAdminAction({
+        userId: admin.id,
+        username: admin.username,
+        userName: admin.name,
+        userRole: admin.role,
+        branchId: admin.branchId || "all",
+        category: "auth",
+        action: "LOGIN",
+        titleAr: "تسجيل دخول إلى لوحة الإدارة",
+        titleEn: "Admin Portal Login",
+        detailsAr: `قام (${admin.name}) بتسجيل الدخول كـ (${admin.role === "master_admin" ? "مدير عام" : "مدير فرع"}).`,
+        detailsEn: `User (${admin.name}) logged in successfully as (${admin.role}).`,
+      });
+    } catch {}
 
     return NextResponse.json({
       success: true,

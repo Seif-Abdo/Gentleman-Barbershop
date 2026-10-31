@@ -6,6 +6,7 @@ import {
   getAllFeedbacks,
   getWhatsAppSettings,
   saveCampaigns,
+  logAdminAction,
 } from "@/lib/db";
 import { WhatsAppCampaign } from "@/lib/types";
 
@@ -121,6 +122,20 @@ export async function POST(req: Request) {
 
     campaigns.unshift(newCampaign);
     await saveCampaigns(campaigns);
+
+    await logAdminAction({
+      userId: master.id,
+      username: master.username,
+      userName: master.name,
+      userRole: master.role,
+      category: "campaigns",
+      action: "CREATE",
+      titleAr: "إطلاق حملة واتساب جديدة",
+      titleEn: "WhatsApp Campaign Launched",
+      detailsAr: `تم إطلاق حملة واتساب بعنوان (${newCampaign.name}) واستهداف (${audienceCount || 0}) عميل.`,
+      detailsEn: `Launched WhatsApp campaign (${newCampaign.name}) targeting (${audienceCount || 0}) clients.`,
+      metadata: { campaignId: newCampaign.id, templateId, audienceCount },
+    });
 
     return NextResponse.json({
       success: true,
