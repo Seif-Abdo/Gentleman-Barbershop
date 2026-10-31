@@ -138,10 +138,10 @@ export default function PortalLoginPage() {
               <span className="text-ivory">مدير زهراء المعادي:</span> admin_zahraa / zahraa2026
             </p>
             <p>
-              <span className="text-ivory">مدير مدينة نصر:</span> admin_nasrcity / nasr2026
+              <span className="text-ivory">مدير مدينة نصر (حسن المأمون):</span> admin_nasrcity / nasr2026
             </p>
             <p>
-              <span className="text-ivory">مدير المعادي الجديدة:</span> admin_newmaadi / maadi2026
+              <span className="text-ivory">مدير مدينة نصر (أبوداود الظاهري):</span> admin_newmaadi / maadi2026
             </p>
           </div>
         </div>

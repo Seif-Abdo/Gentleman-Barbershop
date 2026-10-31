@@ -82,7 +82,7 @@ const DEFAULT_ADMINS: AdminUser[] = [
   {
     id: "admin-nasrcity",
     username: "admin_nasrcity",
-    name: "مدير فرع مدينة نصر",
+    name: "مدير فرع مدينة نصر (حسن المأمون)",
     role: "branch_admin",
     branchId: "nasr-city",
     password: "nasr2026",
@@ -215,7 +215,7 @@ const SEED_FEEDBACKS = [
     suggestion: "زيادة عدد الكراسي في أوقات الذروة.",
   },
 
-  // New Maadi
+  // Branch 3: Nasr City (Abou Dawoud El Zahery)
   {
     branchId: "new-maadi",
     clientName: "شريف النجار",
@@ -225,7 +225,7 @@ const SEED_FEEDBACKS = [
     barberRating: 5,
     barberLikes: "أحمد سيد أستاذ في المقص الكلاسيكي، راحة نفسية وشغل عالي.",
     shopRating: 5,
-    shopLikes: "فرع المعادي الجديدة هادئ جداً وفخم ونظيف للغاية.",
+    shopLikes: "فرع أبوداود الظاهري هادئ جداً وفخم ونظيف للغاية.",
     suggestion: "توفير مساحات انتظار خارجية.",
   },
   {

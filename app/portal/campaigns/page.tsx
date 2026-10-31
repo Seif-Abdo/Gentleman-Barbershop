@@ -463,7 +463,7 @@ export default function WhatsAppCampaignsPage() {
                   type="text"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
-                  placeholder={locale === "ar" ? "مثال: حملة عروض نهاية الأسبوع فرع مدينة نصر" : "e.g. Weekend Special"}
+                  placeholder={locale === "ar" ? "مثال: حملة عروض نهاية الأسبوع فرع مدينة نصر (حسن المأمون)" : "e.g. Weekend Special"}
                   className="w-full px-4 py-2.5 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
                 />
               </div>
@@ -578,7 +578,7 @@ export default function WhatsAppCampaignsPage() {
                     </span>
                   </div>
                   <p className="text-xs text-ivory-muted">
-                    استهداف: {camp.targetFilter.branchId === "all" ? "جميع الفروع" : camp.targetFilter.branchId} · شريحة {camp.targetFilter.ageGroup}
+                    استهداف: {camp.targetFilter.branchId === "all" ? (locale === "ar" ? "جميع الفروع" : "All Branches") : (branches.find((b) => b.id === camp.targetFilter.branchId)?.[locale === "ar" ? "nameAr" : "nameEn"] || camp.targetFilter.branchId)} · {locale === "ar" ? `شريحة ${camp.targetFilter.ageGroup}` : `Age: ${camp.targetFilter.ageGroup}`}
                   </p>
                 </div>
 
