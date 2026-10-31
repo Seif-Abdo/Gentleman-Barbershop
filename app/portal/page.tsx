@@ -24,6 +24,7 @@ import {
   MapPin,
   ArrowLeft,
   ArrowRight,
+  Scissors,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -198,9 +199,9 @@ export default function PortalDashboardPage() {
         onSelectBranch={(b) => setSelectedBranch(b)}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Scope Banner & Export Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border text-start">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
@@ -883,8 +884,8 @@ export default function PortalDashboardPage() {
         </div>
 
         {/* Live Client Feedback Feed with Phone Numbers */}
-        <div className="gold-card p-6 sm:p-7 rounded-3xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="gold-card p-4 sm:p-7 rounded-3xl space-y-6 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-start">
             <div>
               <h3 className="text-lg font-bold text-ivory">
                 {locale === "ar" ? "سجل آراء العملاء وأرقام الهواتف" : "Client Feedback & Contact Registry"}
@@ -896,15 +897,15 @@ export default function PortalDashboardPage() {
               </p>
             </div>
 
-            <div className="relative max-w-xs w-full">
+            <div className="relative w-full sm:max-w-xs">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={locale === "ar" ? "بحث بالاسم أو الهاتف أو الملاحظات..." : "Search name, phone, comments..."}
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
+                className="w-full pl-9 pr-4 rtl:pr-9 rtl:pl-4 py-2.5 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
               />
-              <Search className="w-3.5 h-3.5 text-ivory-muted absolute top-3 left-3 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-ivory-muted absolute top-3.5 left-3 rtl:left-auto rtl:right-3 pointer-events-none" />
             </div>
           </div>
 
@@ -917,63 +918,80 @@ export default function PortalDashboardPage() {
               filteredFeedbacks.map((item) => (
                 <div
                   key={item.id}
-                  className={`p-4 rounded-xl border space-y-2 transition-all ${
+                  className={`p-4 rounded-2xl border space-y-3 transition-all ${
                     item.isLowRating
                       ? "bg-red-950/15 border-red-500/40"
                       : "bg-surface-2 border-border hover:border-gold/40"
                   }`}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-ivory">
-                        {item.clientName || (locale === "ar" ? "عميل جنتل مان" : "Client")}
-                      </span>
-                      {item.clientPhone && (
-                        <span className="flex items-center gap-1 font-mono text-gold bg-gold/10 px-2 py-0.5 rounded-full border border-gold/30">
-                          <Phone className="w-3 h-3" />
-                          <span>{item.clientPhone}</span>
+                  {/* Top Row: Client Info, Age Badge, Phone, Ratings & Date */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-border/50 text-xs">
+                    {/* Identity & Phone */}
+                    <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-ivory text-sm sm:text-xs">
+                          {item.clientName || (locale === "ar" ? "عميل جنتل مان" : "Client")}
                         </span>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${
+                            AGE_GROUPS[item.ageGroup]?.badgeClass
+                          }`}
+                        >
+                          {AGE_GROUPS[item.ageGroup]?.labelAr}
+                        </span>
+                      </div>
+
+                      {item.clientPhone && (
+                        <a
+                          href={`tel:${item.clientPhone}`}
+                          className="inline-flex items-center gap-1 font-mono text-gold bg-gold/10 px-2.5 py-1 rounded-full border border-gold/30 text-xs hover:bg-gold/20 transition-colors"
+                          dir="ltr"
+                        >
+                          <Phone className="w-3 h-3 text-gold shrink-0" />
+                          <span>{item.clientPhone}</span>
+                        </a>
                       )}
-                      <span className="text-ivory-muted">·</span>
-                      <span className="text-gold font-semibold">
-                        فرع: {branches.find((b) => b.id === item.branchId)?.nameAr || item.branchId}
-                      </span>
-                      <span className="text-ivory-muted">·</span>
-                      <span className="text-ivory font-semibold">حلاق: {item.barber}</span>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                          AGE_GROUPS[item.ageGroup]?.badgeClass
-                        }`}
-                      >
-                        {AGE_GROUPS[item.ageGroup]?.labelAr}
-                      </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    {/* Ratings & Date */}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 text-xs">
                       <span className="text-gold font-bold">
                         صالون: {item.shopRating}★ | حلاق: {item.barberRating}★
                       </span>
-                      <span className="text-ivory-muted text-[11px]">{item.dateDisplay}</span>
+                      <span className="text-ivory-muted text-[11px] font-mono">{item.dateDisplay}</span>
                     </div>
                   </div>
 
+                  {/* Branch & Barber Badges */}
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="inline-flex items-center gap-1 bg-[#141414] text-gold font-semibold px-2.5 py-1 rounded-lg border border-gold/30 text-[11px]">
+                      <MapPin className="w-3 h-3 text-gold" />
+                      <span>فرع: {branches.find((b) => b.id === item.branchId)?.nameAr || item.branchId}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 bg-[#141414] text-ivory font-semibold px-2.5 py-1 rounded-lg border border-border text-[11px]">
+                      <Scissors className="w-3 h-3 text-gold" />
+                      <span>حلاق: {item.barber}</span>
+                    </span>
+                  </div>
+
+                  {/* Comments & Suggestions */}
                   {item.barberFeedback && (
-                    <p className="text-xs text-ivory leading-relaxed">
+                    <p className="text-xs text-ivory leading-relaxed bg-[#141414]/50 p-2.5 rounded-xl border border-border/40">
                       <span className="text-gold font-semibold">عن الحلاق: </span>
                       {item.barberFeedback}
                     </p>
                   )}
 
                   {item.shopFeedback && (
-                    <p className="text-xs text-ivory-muted leading-relaxed">
+                    <p className="text-xs text-ivory-muted leading-relaxed bg-[#141414]/50 p-2.5 rounded-xl border border-border/40">
                       <span className="text-gold-light font-semibold">عن الفرع: </span>
                       {item.shopFeedback}
                     </p>
                   )}
 
                   {item.suggestion && (
-                    <p className="text-xs text-ivory-muted italic bg-surface/60 p-2 rounded-lg border border-border">
-                      <span className="text-gold font-semibold">اقتراح: </span>
+                    <p className="text-xs text-ivory-muted italic bg-surface/80 p-2.5 rounded-xl border border-gold/30">
+                      <span className="text-gold font-semibold not-italic">اقتراح: </span>
                       {item.suggestion}
                     </p>
                   )}
