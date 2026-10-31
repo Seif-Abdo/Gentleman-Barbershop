@@ -1,8 +1,10 @@
 import { AGE_GROUPS, AgeGroupId } from "@/config/age-groups";
 import { THEMES } from "@/config/themes";
+import { DEFAULT_BRANCHES } from "@/config/branches";
 import {
   AgeGroupDistributionItem,
   BarberLeaderboardItem,
+  BranchComparisonItem,
   DashboardData,
   DashboardKPIs,
   NormalizedFeedback,
@@ -207,6 +209,74 @@ export function aggregateDashboardData(
   // Generate deterministic business insights
   const insights = generateInsights(filtered, kpis, ageDistribution, themeMetrics);
 
+  // Branch Comparison (Calculated across branches)
+  const branchComparison: BranchComparisonItem[] = DEFAULT_BRANCHES.map((b) => {
+    const bFeedbacks = feedbacks.filter((f) => f.branchId === b.id);
+    // Apply secondary filters (dateRange, ageGroup) if present
+    const branchFiltered = filterFeedbacks(bFeedbacks, {
+      dateRange: filters.dateRange,
+      ageGroup: filters.ageGroup,
+    });
+
+    const count = branchFiltered.length;
+    let sumShop = 0;
+    let sumBarber = 0;
+    let positive = 0;
+    let neutral = 0;
+    let negative = 0;
+    let highRatingCount = 0;
+
+    const bMap: Record<string, { total: number; count: number }> = {};
+
+    for (const f of branchFiltered) {
+      sumShop += f.shopRating;
+      sumBarber += f.barberRating;
+      if (f.sentiment === "positive") positive++;
+      else if (f.sentiment === "negative") negative++;
+      else neutral++;
+
+      if (f.shopRating >= 4) highRatingCount++;
+
+      if (!bMap[f.barber]) bMap[f.barber] = { total: 0, count: 0 };
+      bMap[f.barber].total += f.barberRating;
+      bMap[f.barber].count++;
+    }
+
+    const avgShop = count > 0 ? parseFloat((sumShop / count).toFixed(2)) : 0;
+    const avgBarber = count > 0 ? parseFloat((sumBarber / count).toFixed(2)) : 0;
+    const overall = count > 0 ? parseFloat(((avgShop + avgBarber) / 2).toFixed(2)) : 0;
+    const satRate = count > 0 ? Math.round((highRatingCount / count) * 100) : 0;
+    const pctOfTotal = total > 0 ? Math.round((count / total) * 100) : 0;
+
+    let topBarber: { name: string; avgRating: number; count: number } | null = null;
+    const bList = Object.entries(bMap)
+      .map(([name, data]) => ({
+        name,
+        avgRating: parseFloat((data.total / data.count).toFixed(2)),
+        count: data.count,
+      }))
+      .sort((x, y) => y.avgRating - x.avgRating);
+    if (bList.length > 0) {
+      topBarber = bList[0];
+    }
+
+    return {
+      branchId: b.id,
+      nameAr: b.nameAr,
+      nameEn: b.nameEn,
+      totalFeedbacks: count,
+      percentageOfTotal: pctOfTotal,
+      avgShopRating: avgShop,
+      avgBarberRating: avgBarber,
+      overallRating: overall,
+      satisfactionRate: satRate,
+      positiveCount: positive,
+      neutralCount: neutral,
+      negativeCount: negative,
+      topBarber,
+    };
+  });
+
   return {
     kpis,
     ageDistribution,
@@ -218,5 +288,6 @@ export function aggregateDashboardData(
     themeMetrics,
     insights,
     recentFeedbacks: filtered.slice(0, 50),
+    branchComparison,
   };
 }

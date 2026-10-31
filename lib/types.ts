@@ -71,6 +71,22 @@ export interface ThemeMetricItem {
   totalMentions: number;
 }
 
+export interface BranchComparisonItem {
+  branchId: string;
+  nameAr: string;
+  nameEn: string;
+  totalFeedbacks: number;
+  percentageOfTotal: number;
+  avgShopRating: number;
+  avgBarberRating: number;
+  overallRating: number;
+  satisfactionRate: number;
+  positiveCount: number;
+  neutralCount: number;
+  negativeCount: number;
+  topBarber: { name: string; avgRating: number; count: number } | null;
+}
+
 export interface DashboardData {
   kpis: DashboardKPIs;
   ageDistribution: AgeGroupDistributionItem[];
@@ -82,6 +98,7 @@ export interface DashboardData {
   themeMetrics: ThemeMetricItem[];
   insights: { id: string; type: "alert" | "success" | "info"; textAr: string; textEn: string }[];
   recentFeedbacks: NormalizedFeedback[];
+  branchComparison?: BranchComparisonItem[];
 }
 
 // Multi-admin RBAC
