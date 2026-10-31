@@ -252,17 +252,30 @@ export default function PortalDashboardPage() {
     }
   };
 
+  const isTotalWipeout = cleanupAll || (cleanupBranch === "all" && cleanupDays === "all");
+
   const handleExecuteCleanup = async () => {
-    if (cleanupAll) {
-      const targetWord = locale === "ar" ? "تأكيد" : "CONFIRM";
-      if (confirmPhrase.trim() !== targetWord) {
+    if (isTotalWipeout) {
+      const cleanPhrase = confirmPhrase.trim().toLowerCase();
+      const isValid =
+        cleanPhrase === "تأكيد" ||
+        cleanPhrase === "تاكيد" ||
+        cleanPhrase === "confirm" ||
+        cleanPhrase === "delete";
+      if (!isValid) {
         alert(
           locale === "ar"
-            ? `يرجى كتابة كلمة "${targetWord}" لتأكيد الحذف الشامل لكافة السجلات.`
-            : `Please type "${targetWord}" to confirm deleting all records.`
+            ? 'يرجى كتابة كلمة "تأكيد" لتأكيد الحذف الشامل لكافة السجلات.'
+            : 'Please type "CONFIRM" to confirm deleting all records.'
         );
         return;
       }
+    } else {
+      const confirmMsg =
+        locale === "ar"
+          ? "هل أنت متأكد من تنفيذ عملية حذف السجلات وفق المعايير المحددة؟ لا يمكن التراجع عن هذه الخطوة."
+          : "Are you sure you want to execute record deletion based on the selected criteria? This action cannot be undone.";
+      if (!window.confirm(confirmMsg)) return;
     }
 
     setIsDeleting(true);
@@ -272,9 +285,9 @@ export default function PortalDashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "criteria",
-          branchId: cleanupAll ? undefined : cleanupBranch,
-          olderThanDays: cleanupAll ? undefined : (cleanupDays === "all" ? undefined : Number(cleanupDays)),
-          all: cleanupAll,
+          branchId: cleanupBranch,
+          olderThanDays: cleanupDays === "all" ? undefined : Number(cleanupDays),
+          all: isTotalWipeout,
         }),
       });
       const resData = await res.json();
@@ -1031,12 +1044,13 @@ export default function PortalDashboardPage() {
 
               {isMaster && (
                 <button
+                  type="button"
                   onClick={() => setIsCleanupModalOpen(true)}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-red-950/30 hover:bg-red-900/50 text-red-400 border border-red-500/40 transition-all shrink-0 shadow-sm"
                   title={locale === "ar" ? "تحديد وحذف بيانات وسجلات معينة" : "Selective Data Purge"}
                 >
                   <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                  <span>{locale === "ar" ? "تنظيف وسجل البيانات" : "Data Cleanup"}</span>
+                  <span>{locale === "ar" ? "تنظيف سجل البيانات" : "Data Cleanup"}</span>
                 </button>
               )}
             </div>
@@ -1356,13 +1370,13 @@ export default function PortalDashboardPage() {
                   </label>
                 </div>
 
-                {/* Confirmation phrase if Total Wipeout */}
-                {cleanupAll && (
+                {/* Confirmation phrase if Total Wipeout, otherwise summary */}
+                {isTotalWipeout ? (
                   <div className="space-y-2 p-3.5 rounded-2xl bg-red-950/30 border border-red-500/50">
                     <label className="text-red-300 font-bold block">
                       {locale === "ar"
-                        ? 'يرجى كتابة كلمة "تأكيد" أدناه لتأكيد الحذف الشامل:'
-                        : 'Please type "CONFIRM" below to verify total deletion:'}
+                        ? 'تنبيه: سيتم حذف كافة السجلات لجميع الفروع. يرجى كتابة "تأكيد" للمتابعة:'
+                        : 'Warning: All records across all branches will be deleted. Please type "CONFIRM":'}
                     </label>
                     <input
                       type="text"
@@ -1371,6 +1385,21 @@ export default function PortalDashboardPage() {
                       placeholder={locale === "ar" ? "تأكيد" : "CONFIRM"}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0A] border border-red-500/50 text-red-300 font-mono text-center focus:border-red-400 focus:outline-none"
                     />
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-2xl bg-surface-2 border border-border/80 text-xs text-ivory flex items-center justify-between gap-2">
+                    <span className="text-ivory-muted">
+                      {locale === "ar" ? "الهدف المحدد للحذف:" : "Target Scope:"}
+                    </span>
+                    <span className="text-gold font-bold">
+                      {cleanupBranch === "all"
+                        ? locale === "ar" ? "جميع الفروع" : "All Branches"
+                        : branches.find((b) => b.id === cleanupBranch)?.nameAr || cleanupBranch}
+                      {" · "}
+                      {cleanupDays === "all"
+                        ? locale === "ar" ? "كافة السجلات" : "All records"
+                        : locale === "ar" ? `الأقدم من ${cleanupDays} يوماً` : `Older than ${cleanupDays}d`}
+                    </span>
                   </div>
                 )}
               </div>

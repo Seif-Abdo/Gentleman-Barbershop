@@ -577,35 +577,42 @@ export async function deleteFeedbacksByCriteria(criteria: {
   await ensureDbInitialized();
   const existing = await getAllFeedbacks();
 
-  let filtered = [...existing];
+  const isAllBranches = !criteria.branchId || criteria.branchId === "all";
+  const hasDays =
+    typeof criteria.olderThanDays === "number" &&
+    !isNaN(criteria.olderThanDays) &&
+    criteria.olderThanDays > 0;
 
-  if (criteria.all) {
+  let filtered: NormalizedFeedback[] = [];
+
+  if (criteria.all || (isAllBranches && !hasDays)) {
+    // Wipe all records if explicitly requested or if targeting all branches with no age limit
     filtered = [];
   } else {
     filtered = existing.filter((f) => {
-      // If branchId filter specified, keep records that do NOT match this branch
-      if (criteria.branchId && criteria.branchId !== "all") {
-        if (f.branchId === criteria.branchId) {
-          if (criteria.olderThanDays) {
-            const cutoff = Date.now() - criteria.olderThanDays * 86400000;
-            const itemTime = new Date(f.timestamp).getTime();
-            if (itemTime < cutoff) return false; // delete
-            return true; // keep
-          }
-          return false; // delete
-        }
-      } else if (criteria.olderThanDays) {
-        const cutoff = Date.now() - criteria.olderThanDays * 86400000;
-        const itemTime = new Date(f.timestamp).getTime();
-        if (itemTime < cutoff) return false; // delete
+      // Check if item belongs to the targeted branch
+      const branchMatches = isAllBranches || f.branchId === criteria.branchId;
+      if (!branchMatches) {
+        return true; // keep records of non-targeted branches
       }
-      return true; // keep
+
+      // If targeted branch, check age constraint
+      if (hasDays) {
+        const cutoff = Date.now() - criteria.olderThanDays! * 86400000;
+        const itemTime = new Date(f.timestamp).getTime();
+        // If older than cutoff -> delete (return false)
+        if (itemTime < cutoff) return false;
+        return true; // keep
+      }
+
+      // Targeted branch with no age limit -> delete
+      return false;
     });
   }
 
   const deletedCount = existing.length - filtered.length;
 
-  if (deletedCount > 0 || criteria.all) {
+  if (deletedCount > 0 || criteria.all || (isAllBranches && !hasDays)) {
     const tempFile = `${FEEDBACKS_FILE}.tmp`;
     await fs.writeFile(tempFile, JSON.stringify(filtered, null, 2), "utf-8");
     await fs.rename(tempFile, FEEDBACKS_FILE);
