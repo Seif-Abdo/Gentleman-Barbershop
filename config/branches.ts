@@ -30,8 +30,8 @@ export const DEFAULT_BRANCHES: Branch[] = [
     whatsapp: "201005107683",
     hoursAr: "يومياً من 11:00 صباحاً حتى 12:00 منتصف الليل (الجمعة من 1:00 ظهراً)",
     hoursEn: "Daily 11:00 AM – 12:00 Midnight (Friday from 1:00 PM)",
-    googleMapsUrl: "https://maps.google.com/?q=83+Al+Mostaqbal+St+Zahraa+El+Maadi+Cairo",
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110502.61185066922!2d31.2584643!3d29.9602!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1458380ff9821267%3A0x6b63690d56ee255e!2sZahraa%20El-Maadi%2C%20Cairo!5e0!3m2!1sen!2seg!4v1700000000000!5m2!1sen!2seg",
+    googleMapsUrl: "https://www.google.com/maps/place/Gentelman+barber/@29.9638756,31.3101237,19z",
+    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d552.6218659822883!2d31.310123680016673!3d29.96387561844036!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583900444f0065%3A0xef7cb137f842cdae!2sGentelman%20barber!5e1!3m2!1sen!2seg!4v1793446167268!5m2!1sen!2seg",
     isActive: true,
   },
   {
