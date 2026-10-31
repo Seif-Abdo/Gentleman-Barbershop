@@ -553,6 +553,67 @@ export async function insertFeedback(input: {
   return record;
 }
 
+export async function deleteFeedbacksByIds(ids: string[]): Promise<number> {
+  await ensureDbInitialized();
+  const existing = await getAllFeedbacks();
+  const idsSet = new Set(ids);
+  const filtered = existing.filter((f) => !idsSet.has(f.id));
+  const deletedCount = existing.length - filtered.length;
+
+  if (deletedCount > 0) {
+    const tempFile = `${FEEDBACKS_FILE}.tmp`;
+    await fs.writeFile(tempFile, JSON.stringify(filtered, null, 2), "utf-8");
+    await fs.rename(tempFile, FEEDBACKS_FILE);
+  }
+
+  return deletedCount;
+}
+
+export async function deleteFeedbacksByCriteria(criteria: {
+  branchId?: string;
+  olderThanDays?: number;
+  all?: boolean;
+}): Promise<number> {
+  await ensureDbInitialized();
+  const existing = await getAllFeedbacks();
+
+  let filtered = [...existing];
+
+  if (criteria.all) {
+    filtered = [];
+  } else {
+    filtered = existing.filter((f) => {
+      // If branchId filter specified, keep records that do NOT match this branch
+      if (criteria.branchId && criteria.branchId !== "all") {
+        if (f.branchId === criteria.branchId) {
+          if (criteria.olderThanDays) {
+            const cutoff = Date.now() - criteria.olderThanDays * 86400000;
+            const itemTime = new Date(f.timestamp).getTime();
+            if (itemTime < cutoff) return false; // delete
+            return true; // keep
+          }
+          return false; // delete
+        }
+      } else if (criteria.olderThanDays) {
+        const cutoff = Date.now() - criteria.olderThanDays * 86400000;
+        const itemTime = new Date(f.timestamp).getTime();
+        if (itemTime < cutoff) return false; // delete
+      }
+      return true; // keep
+    });
+  }
+
+  const deletedCount = existing.length - filtered.length;
+
+  if (deletedCount > 0 || criteria.all) {
+    const tempFile = `${FEEDBACKS_FILE}.tmp`;
+    await fs.writeFile(tempFile, JSON.stringify(filtered, null, 2), "utf-8");
+    await fs.rename(tempFile, FEEDBACKS_FILE);
+  }
+
+  return deletedCount;
+}
+
 // ================= ADMINS =================
 export async function getAllAdmins(): Promise<AdminUser[]> {
   await ensureDbInitialized();

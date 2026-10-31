@@ -25,6 +25,11 @@ import {
   ArrowLeft,
   ArrowRight,
   Scissors,
+  Trash2,
+  CheckSquare,
+  Square,
+  X,
+  AlertCircle,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -60,6 +65,16 @@ export default function PortalDashboardPage() {
   const [ageGroup, setAgeGroup] = useState("all");
   const [barber, setBarber] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Master Admin Data Deletion Controls
+  const [selectedFeedbackIds, setSelectedFeedbackIds] = useState<string[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCleanupModalOpen, setIsCleanupModalOpen] = useState(false);
+  const [cleanupBranch, setCleanupBranch] = useState("all");
+  const [cleanupDays, setCleanupDays] = useState("all");
+  const [cleanupAll, setCleanupAll] = useState(false);
+  const [confirmPhrase, setConfirmPhrase] = useState("");
+  const [notice, setNotice] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   // 1. Check Auth & Load Branches
   useEffect(() => {
@@ -183,6 +198,104 @@ export default function PortalDashboardPage() {
       f.suggestion.toLowerCase().includes(term)
     );
   });
+
+  const isMaster = currentUser.role === "master_admin";
+
+  const handleToggleSelectFeedback = (id: string) => {
+    setSelectedFeedbackIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllVisible = () => {
+    if (selectedFeedbackIds.length === filteredFeedbacks.length && filteredFeedbacks.length > 0) {
+      setSelectedFeedbackIds([]);
+    } else {
+      setSelectedFeedbackIds(filteredFeedbacks.map((f) => f.id));
+    }
+  };
+
+  const handleDeleteByIds = async (ids: string[]) => {
+    if (!ids.length) return;
+    const confirmMessage =
+      ids.length === 1
+        ? locale === "ar"
+          ? "هل أنت متأكد من حذف هذا السجل نهائياً؟ لا يمكن التراجع عن هذه الخطوة."
+          : "Are you sure you want to permanently delete this record? This action cannot be undone."
+        : locale === "ar"
+        ? `هل أنت متأكد من حذف ${ids.length} سجلات محددة نهائياً؟ لا يمكن التراجع عن هذه الخطوة.`
+        : `Are you sure you want to permanently delete ${ids.length} selected records? This action cannot be undone.`;
+
+    if (!window.confirm(confirmMessage)) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch("/api/feedbacks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "ids", ids }),
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "فشل حذف السجلات");
+
+      setNotice({
+        text: resData.message || (locale === "ar" ? "تم الحذف بنجاح" : "Deleted successfully"),
+        type: "success",
+      });
+      setSelectedFeedbackIds((prev) => prev.filter((id) => !ids.includes(id)));
+      await loadData();
+    } catch (err: any) {
+      setNotice({ text: err.message, type: "error" });
+    } finally {
+      setIsDeleting(false);
+      setTimeout(() => setNotice(null), 4000);
+    }
+  };
+
+  const handleExecuteCleanup = async () => {
+    if (cleanupAll) {
+      const targetWord = locale === "ar" ? "تأكيد" : "CONFIRM";
+      if (confirmPhrase.trim() !== targetWord) {
+        alert(
+          locale === "ar"
+            ? `يرجى كتابة كلمة "${targetWord}" لتأكيد الحذف الشامل لكافة السجلات.`
+            : `Please type "${targetWord}" to confirm deleting all records.`
+        );
+        return;
+      }
+    }
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch("/api/feedbacks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "criteria",
+          branchId: cleanupAll ? undefined : cleanupBranch,
+          olderThanDays: cleanupAll ? undefined : (cleanupDays === "all" ? undefined : Number(cleanupDays)),
+          all: cleanupAll,
+        }),
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "فشل تنفيذ عملية التنظيف");
+
+      setNotice({
+        text: resData.message || (locale === "ar" ? "تمت عملية تنظيف السجلات بنجاح" : "Cleanup completed successfully"),
+        type: "success",
+      });
+      setIsCleanupModalOpen(false);
+      setCleanupAll(false);
+      setConfirmPhrase("");
+      setSelectedFeedbackIds([]);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsDeleting(false);
+      setTimeout(() => setNotice(null), 5000);
+    }
+  };
 
   const activeBranchName =
     selectedBranch === "all"
@@ -883,13 +996,20 @@ export default function PortalDashboardPage() {
           </div>
         </div>
 
-        {/* Live Client Feedback Feed with Phone Numbers */}
+        {/* Live Client Feedback Feed with Phone Numbers & Master Admin Deletion */}
         <div className="gold-card p-4 sm:p-7 rounded-3xl space-y-6 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-start">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-start">
             <div>
-              <h3 className="text-lg font-bold text-ivory">
-                {locale === "ar" ? "سجل آراء العملاء وأرقام الهواتف" : "Client Feedback & Contact Registry"}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-ivory">
+                  {locale === "ar" ? "سجل آراء العملاء وأرقام الهواتف" : "Client Feedback & Contact Registry"}
+                </h3>
+                {isMaster && (
+                  <span className="text-[10px] bg-red-950/40 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-semibold">
+                    {locale === "ar" ? "تحكم المدير العام" : "Master Admin"}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-ivory-muted">
                 {locale === "ar"
                   ? "يتضمن أرقام هواتف العملاء المسجلة لاستخدامها في المتابعة وحملات الواتساب"
@@ -897,17 +1017,116 @@ export default function PortalDashboardPage() {
               </p>
             </div>
 
-            <div className="relative w-full sm:max-w-xs">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={locale === "ar" ? "بحث بالاسم أو الهاتف أو الملاحظات..." : "Search name, phone, comments..."}
-                className="w-full pl-9 pr-4 rtl:pr-9 rtl:pl-4 py-2.5 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
-              />
-              <Search className="w-3.5 h-3.5 text-ivory-muted absolute top-3.5 left-3 rtl:left-auto rtl:right-3 pointer-events-none" />
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+              <div className="relative w-full sm:w-64">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={locale === "ar" ? "بحث بالاسم أو الهاتف..." : "Search name, phone..."}
+                  className="w-full pl-9 pr-4 rtl:pr-9 rtl:pl-4 py-2 rounded-xl bg-surface-2 border border-border text-xs text-ivory focus:border-gold focus:outline-none"
+                />
+                <Search className="w-3.5 h-3.5 text-ivory-muted absolute top-3 left-3 rtl:left-auto rtl:right-3 pointer-events-none" />
+              </div>
+
+              {isMaster && (
+                <button
+                  onClick={() => setIsCleanupModalOpen(true)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-red-950/30 hover:bg-red-900/50 text-red-400 border border-red-500/40 transition-all shrink-0 shadow-sm"
+                  title={locale === "ar" ? "تحديد وحذف بيانات وسجلات معينة" : "Selective Data Purge"}
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                  <span>{locale === "ar" ? "تنظيف وسجل البيانات" : "Data Cleanup"}</span>
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Deletion / Action Notice */}
+          {notice && (
+            <div
+              className={`p-3.5 rounded-xl text-xs flex items-center justify-between gap-2 transition-all ${
+                notice.type === "success"
+                  ? "bg-emerald-950/40 border border-emerald-500/40 text-emerald-300"
+                  : "bg-red-950/40 border border-red-500/40 text-red-300"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{notice.text}</span>
+              </div>
+              <button
+                onClick={() => setNotice(null)}
+                className="opacity-70 hover:opacity-100 text-ivory p-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* Master Admin Multi-Select Action Bar */}
+          {isMaster && filteredFeedbacks.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-surface-2 border border-border/80 text-xs">
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedFeedbackIds.length > 0 &&
+                      selectedFeedbackIds.length === filteredFeedbacks.length
+                    }
+                    onChange={handleSelectAllVisible}
+                    className="w-4 h-4 rounded border-border accent-[#D4AF37] cursor-pointer"
+                  />
+                  <span className="text-ivory font-medium">
+                    {selectedFeedbackIds.length === filteredFeedbacks.length &&
+                    filteredFeedbacks.length > 0
+                      ? locale === "ar"
+                        ? "إلغاء تحديد الكل"
+                        : "Deselect All"
+                      : locale === "ar"
+                      ? `تحديد الكل (${filteredFeedbacks.length})`
+                      : `Select All (${filteredFeedbacks.length})`}
+                  </span>
+                </label>
+
+                {selectedFeedbackIds.length > 0 && (
+                  <span className="text-gold font-bold bg-gold/10 px-2 py-0.5 rounded-full border border-gold/30 text-[11px]">
+                    {locale === "ar"
+                      ? `تم تحديد ${selectedFeedbackIds.length} سجل`
+                      : `${selectedFeedbackIds.length} selected`}
+                  </span>
+                )}
+              </div>
+
+              {selectedFeedbackIds.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleDeleteByIds(selectedFeedbackIds)}
+                    disabled={isDeleting}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors disabled:opacity-50 shadow-sm"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>
+                      {isDeleting
+                        ? locale === "ar"
+                          ? "جارِ الحذف..."
+                          : "Deleting..."
+                        : locale === "ar"
+                        ? `حذف المحدد (${selectedFeedbackIds.length})`
+                        : `Delete Selected (${selectedFeedbackIds.length})`}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedFeedbackIds([])}
+                    className="px-2.5 py-1.5 rounded-xl text-ivory-muted hover:text-ivory text-xs bg-surface border border-border hover:border-gold/30 transition-colors"
+                  >
+                    {locale === "ar" ? "إلغاء التحديد" : "Clear"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="space-y-3">
             {filteredFeedbacks.length === 0 ? (
@@ -919,15 +1138,27 @@ export default function PortalDashboardPage() {
                 <div
                   key={item.id}
                   className={`p-4 rounded-2xl border space-y-3 transition-all ${
-                    item.isLowRating
+                    selectedFeedbackIds.includes(item.id)
+                      ? "bg-gold/5 border-gold/60 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                      : item.isLowRating
                       ? "bg-red-950/15 border-red-500/40"
                       : "bg-surface-2 border-border hover:border-gold/40"
                   }`}
                 >
-                  {/* Top Row: Client Info, Age Badge, Phone, Ratings & Date */}
+                  {/* Top Row: Checkbox, Client Info, Age Badge, Phone, Ratings, Date & Trash */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-border/50 text-xs">
                     {/* Identity & Phone */}
-                    <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2">
+                    <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2.5">
+                      {isMaster && (
+                        <input
+                          type="checkbox"
+                          checked={selectedFeedbackIds.includes(item.id)}
+                          onChange={() => handleToggleSelectFeedback(item.id)}
+                          className="w-4 h-4 rounded border-border accent-[#D4AF37] cursor-pointer"
+                          title={locale === "ar" ? "تحديد هذا السجل" : "Select this record"}
+                        />
+                      )}
+
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-ivory text-sm sm:text-xs">
                           {item.clientName || (locale === "ar" ? "عميل جنتل مان" : "Client")}
@@ -953,12 +1184,23 @@ export default function PortalDashboardPage() {
                       )}
                     </div>
 
-                    {/* Ratings & Date */}
+                    {/* Ratings, Date & Single Trash Button */}
                     <div className="flex items-center justify-between sm:justify-end gap-3 text-xs">
                       <span className="text-gold font-bold">
                         صالون: {item.shopRating}★ | حلاق: {item.barberRating}★
                       </span>
                       <span className="text-ivory-muted text-[11px] font-mono">{item.dateDisplay}</span>
+
+                      {isMaster && (
+                        <button
+                          onClick={() => handleDeleteByIds([item.id])}
+                          disabled={isDeleting}
+                          title={locale === "ar" ? "حذف هذا السجل نهائياً" : "Delete record permanently"}
+                          className="p-1.5 rounded-lg text-ivory-muted hover:text-red-400 hover:bg-red-950/40 border border-transparent hover:border-red-500/40 transition-all disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -1000,6 +1242,174 @@ export default function PortalDashboardPage() {
             )}
           </div>
         </div>
+
+        {/* Master Admin Bulk Cleanup Modal */}
+        {isMaster && isCleanupModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-[#141414] border border-red-500/30 rounded-3xl p-6 sm:p-7 max-w-lg w-full space-y-6 shadow-[0_10px_40px_rgba(0,0,0,0.8)] text-start animate-fade-in">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-2xl bg-red-950/40 border border-red-500/40 flex items-center justify-center text-red-400">
+                    <Trash2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-ivory">
+                      {locale === "ar" ? "خيارات تنظيف وحذف بيانات العملاء" : "Customer Data Cleanup Options"}
+                    </h4>
+                    <span className="text-[11px] text-red-400/80 font-medium">
+                      {locale === "ar" ? "خاص بالمدير العام فقط (Master Admin)" : "Master Admin Only"}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsCleanupModalOpen(false)}
+                  className="p-1.5 rounded-xl text-ivory-muted hover:text-ivory hover:bg-surface-2 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Security Warning */}
+              <div className="p-3.5 rounded-2xl bg-red-950/20 border border-red-500/30 text-xs text-red-300 leading-relaxed space-y-1">
+                <div className="font-bold flex items-center gap-1.5 text-red-400">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>{locale === "ar" ? "تنبيه أمان هام" : "Security Notice"}</span>
+                </div>
+                <p>
+                  {locale === "ar"
+                    ? "الحذف يتم نهائياً من قاعدة البيانات. سيتم فوراً تحديث مؤشرات الأداء ولوحة التحليلات ومعدلات الرضا وفق السجلات المتبقية."
+                    : "Records will be permanently purged from the database. KPIs and dashboard analytics will update immediately based on remaining records."}
+                </p>
+              </div>
+
+              {/* Mode Selection */}
+              <div className="space-y-4 text-xs">
+                {/* 1. Branch selection */}
+                <div className="space-y-1.5">
+                  <label className="text-ivory font-semibold">
+                    {locale === "ar" ? "1. نطاق الفرع المراد حذفه:" : "1. Branch Scope:"}
+                  </label>
+                  <select
+                    disabled={cleanupAll}
+                    value={cleanupBranch}
+                    onChange={(e) => setCleanupBranch(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border text-ivory focus:border-gold focus:outline-none disabled:opacity-50"
+                  >
+                    <option value="all">
+                      {locale === "ar" ? "جميع الفروع (تطبيق على الكل)" : "All Branches"}
+                    </option>
+                    {branches.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.nameAr} ({b.nameEn})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Age/Time selection */}
+                <div className="space-y-1.5">
+                  <label className="text-ivory font-semibold">
+                    {locale === "ar" ? "2. الفترة الزمنية للسجلات المراد حذفها:" : "2. Time Range / Age:"}
+                  </label>
+                  <select
+                    disabled={cleanupAll}
+                    value={cleanupDays}
+                    onChange={(e) => setCleanupDays(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border text-ivory focus:border-gold focus:outline-none disabled:opacity-50"
+                  >
+                    <option value="all">
+                      {locale === "ar" ? "كل السجلات (بغض النظر عن التاريخ)" : "All records (any date)"}
+                    </option>
+                    <option value="30">
+                      {locale === "ar" ? "السجلات الأقدم من 30 يوماً" : "Older than 30 days"}
+                    </option>
+                    <option value="60">
+                      {locale === "ar" ? "السجلات الأقدم من 60 يوماً" : "Older than 60 days"}
+                    </option>
+                    <option value="90">
+                      {locale === "ar" ? "السجلات الأقدم من 90 يوماً" : "Older than 90 days"}
+                    </option>
+                  </select>
+                </div>
+
+                {/* 3. Total Wipeout Checkbox */}
+                <div className="pt-2 border-t border-border/50">
+                  <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-surface-2/60 border border-border cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={cleanupAll}
+                      onChange={(e) => setCleanupAll(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 rounded border-border accent-red-600 cursor-pointer"
+                    />
+                    <div className="space-y-0.5">
+                      <span className="font-bold text-red-400 block">
+                        {locale === "ar"
+                          ? "حذف شامل لكافة البيانات والتقييمات بالكامل"
+                          : "Wipe all feedback and customer data entirely"}
+                      </span>
+                      <span className="text-[11px] text-ivory-muted block">
+                        {locale === "ar"
+                          ? "تفريغ تام لجميع آراء العملاء في كل الفروع والبدء بسجل نظيف"
+                          : "Purges all customer feedbacks across all branches to start fresh"}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Confirmation phrase if Total Wipeout */}
+                {cleanupAll && (
+                  <div className="space-y-2 p-3.5 rounded-2xl bg-red-950/30 border border-red-500/50">
+                    <label className="text-red-300 font-bold block">
+                      {locale === "ar"
+                        ? 'يرجى كتابة كلمة "تأكيد" أدناه لتأكيد الحذف الشامل:'
+                        : 'Please type "CONFIRM" below to verify total deletion:'}
+                    </label>
+                    <input
+                      type="text"
+                      value={confirmPhrase}
+                      onChange={(e) => setConfirmPhrase(e.target.value)}
+                      placeholder={locale === "ar" ? "تأكيد" : "CONFIRM"}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0A] border border-red-500/50 text-red-300 font-mono text-center focus:border-red-400 focus:outline-none"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-border/60">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCleanupModalOpen(false);
+                    setCleanupAll(false);
+                    setConfirmPhrase("");
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-ivory-muted hover:text-ivory hover:bg-surface-2 transition-colors"
+                >
+                  {locale === "ar" ? "إلغاء" : "Cancel"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleExecuteCleanup}
+                  disabled={isDeleting}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors disabled:opacity-50 shadow-lg shadow-red-950/50"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>
+                    {isDeleting
+                      ? locale === "ar"
+                        ? "جارِ التنفيذ..."
+                        : "Processing..."
+                      : locale === "ar"
+                      ? "تأكيد الحذف النهائي"
+                      : "Execute Deletion"}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
