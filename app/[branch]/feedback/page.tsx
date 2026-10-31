@@ -93,7 +93,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
     if (!selectedBarber) {
       setErrorMsg(
         locale === "ar"
-          ? "اختار الحلاق اللي ظبطلك الحلاقة يا باشا."
+          ? "يرجى اختيار الحلاق الذي تولى خدمتكم يا فندم."
           : "Please select the barber who styled your hair."
       );
       return;
@@ -179,11 +179,11 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
           <span>{locale === "ar" ? `فرع: ${branch.nameAr}` : `${branch.nameEn} Branch`}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-ivory tracking-tight">
-          {locale === "ar" ? "نوّرتنا يا باشا.. قولنا رأيك بصراحة!" : "Share Your Experience with Us"}
+          {locale === "ar" ? "نوّرتنا يا فندم.. نسعد برأيكم وتقييمكم" : "Share Your Experience with Us"}
         </h1>
         <p className="text-sm sm:text-base text-ivory-muted max-w-xl mx-auto leading-relaxed">
           {locale === "ar"
-            ? `رأيك يهمنا من القلب، وبيوصل مباشرة لإدارة فرع ${branch.nameAr} عشان نفضل دايماً رقم واحد في حلاقتك وشياكتك.`
+            ? `رأيكم يهمنا دائماً، ويصل مباشرة لإدارة فرع ${branch.nameAr} لنحرص باستمرار على تقديم أرقى مستوى من الخدمة والعناية الملكية.`
             : `Your honest feedback goes directly to management so we continually elevate your grooming experience.`}
         </p>
 
@@ -191,10 +191,10 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
         <div className="pt-6 max-w-md mx-auto">
           <div className="flex items-center justify-between text-xs font-bold mb-2">
             <span className={step === 1 ? "text-gold font-extrabold" : "text-ivory-muted"}>
-              {locale === "ar" ? "1. شغل وإيد الحلاق" : "1. Barber Feedback"}
+              {locale === "ar" ? "1. تقييم أداء ومهارة الحلاق" : "1. Barber Feedback"}
             </span>
             <span className={step === 2 ? "text-gold font-extrabold" : "text-ivory-muted"}>
-              {locale === "ar" ? "2. قعدة ومستوى المحل" : "2. Shop & Atmosphere"}
+              {locale === "ar" ? "2. مستوى الصالون والضيافة" : "2. Shop & Atmosphere"}
             </span>
           </div>
           <div className="h-2.5 w-full bg-[#181818] rounded-full overflow-hidden border border-border">
@@ -239,7 +239,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder={locale === "ar" ? "اسمك يا محترم (مثلاً: أحمد، كريم...)" : "Your name"}
+                  placeholder={locale === "ar" ? "الاسم الكريم (مثلاً: أحمد، كريم...)" : "Your name"}
                   className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
                 />
               </div>
@@ -300,7 +300,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                   <Scissors className="w-4 h-4 text-gold" />
                   <span>
                     {locale === "ar"
-                      ? `2. مين الحلاق اللي حلقت معاه في فرع ${branch.nameAr}؟`
+                      ? `2. مين الحلاق اللي تولى خدمتكم في فرع ${branch.nameAr} يا فندم؟`
                       : `2. Which barber styled your hair at ${branch.nameEn}?`}
                   </span>
                   <span className="text-gold text-xs">*</span>
@@ -355,7 +355,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
               <div className="flex items-center justify-between">
                 <label className="text-sm sm:text-base font-bold text-ivory">
                   {locale === "ar"
-                    ? `3. تقييمك لشغل وإيد الحلاق (${selectedBarber || "الحلاق"}) كان إيه؟`
+                    ? `3. تقييمكم لمستوى ومهارة الحلاق (${selectedBarber || "الحلاق"}) يا فندم؟`
                     : `3. Rate your experience with (${selectedBarber || "Barber"})`}
                   <span className="text-gold text-xs ml-1">*</span>
                 </label>
@@ -401,7 +401,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "4. إيه أكتر حاجة عجبتك في إيد الحلاق وشغله؟ (اختياري)"
+                  ? "4. ما أكثر ما نال إعجابكم في أداء الحلاق؟ (اختياري)"
                   : "4. What did you like most about the barber? (optional)"}
               </label>
               <textarea
@@ -410,7 +410,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setBarberLikes(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: إيده خفيفة، فاهم في التدريج والمقص، محترم وبيسمع الكلام، دقيق في التحديد..."
+                    ? "مثال: دقة التدريج، خفة اليد، حسن المعاملة والإنصات..."
                     : "e.g. Precise fade, gentle hands, polite, listened carefully..."
                 }
                 className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
@@ -421,7 +421,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "5. إيه اللي الحلاق محتاج ياخد باله منه المرة الجاية؟ (اختياري)"
+                  ? "5. أي ملاحظات أو مقترحات ترغبون في إيصالها للحلاق؟ (اختياري)"
                   : "5. What could the barber improve? (optional)"}
               </label>
               <textarea
@@ -458,7 +458,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
               <div className="flex items-center justify-between">
                 <label className="text-sm sm:text-base font-bold text-ivory">
                   {locale === "ar"
-                    ? `6. تقييمك العام لفرع ${branch.nameAr} والقعدة والضيافة؟`
+                    ? `6. تقييمكم العام لفرع ${branch.nameAr} ومستوى الاستقبال والضيافة؟`
                     : `6. Your overall rating of ${branch.nameEn} branch`}
                   <span className="text-gold text-xs ml-1">*</span>
                 </label>
@@ -503,7 +503,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? `7. إيه اللي عجبك في المكان والفرع؟ (اختياري)`
+                  ? `7. ما أكثر ما نال إعجابكم في الفرع وأجواء المكان؟ (اختياري)`
                   : "7. What did you enjoy about the shop? (optional)"}
               </label>
               <textarea
@@ -512,7 +512,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setShopLikes(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: النظافة والريحة الحلوة، التكييف، حسن الاستقبال، الفوط السخنة، شياكة الديكور..."
+                    ? "مثال: النظافة والتعقيم، التكييف، حسن الاستقبال، الفوط السخنة، شياكة الديكور..."
                     : "e.g. Hygiene, welcoming staff, cool AC, luxury vibe, hot towels..."
                 }
                 className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
@@ -523,7 +523,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "8. في أي حاجة ضايقتك في المكان أو محتاجة تظبيط؟ (اختياري)"
+                  ? "8. أي ملاحظات أو مقترحات ترغبون في إضافتها لتحسين الفرع؟ (اختياري)"
                   : "8. Anything you'd like us to improve in the shop? (optional)"}
               </label>
               <textarea
@@ -532,7 +532,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setShopImprovements(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: وقت الانتظار والدور، درجة التكييف، مواعيد الزحمة..."
+                    ? "مثال: مواعيد الحجز، وقت الانتظار، درجة التكييف..."
                     : "e.g. Waiting time, AC temperature, rush hours management..."
                 }
                 className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
@@ -543,7 +543,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2 pb-6 border-b border-border">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "9. نفسك نوفر إيه جديد في صالون جنتل مان؟ (اختياري)"
+                  ? "9. خدمات إضافية تحب نوفرها في صالون جنتل مان؟ (اختياري)"
                   : "9. Suggestions for services or perks you'd love to see (optional)"}
               </label>
               <textarea
@@ -552,7 +552,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setSuggestion(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "أي فكرة أو خدمة تحب تلاقيها المرة الجاية... صالونك وتحت أمرك يا باشا!"
+                    ? "أي فكرة أو خدمة تحب تلاقيها المرة الجاية... نسعد بخدمتكم دائماً يا فندم."
                     : "Any new treatment, grooming service or perk you'd love to enjoy..."
                 }
                 className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"

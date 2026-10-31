@@ -126,7 +126,7 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
               <MessageSquareQuote className="w-5 h-5" />
               <span>
                 {locale === "ar"
-                  ? `قولنا رأيك في فرع ${currentBranch.nameAr}`
+                  ? `شاركنا رأيك في فرع ${currentBranch.nameAr} يا فندم`
                   : `Review ${currentBranch.nameEn}`}
               </span>
               <ArrowIcon className="w-4 h-4" />
@@ -333,7 +333,7 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-105"
               >
                 <MessageSquareQuote className="w-4 h-4" />
-                <span>{locale === "ar" ? "قولنا رأيك يا باشا" : "Share Your Experience"}</span>
+                <span>{locale === "ar" ? "شاركنا تقييمك ورأيك يا فندم" : "Share Your Experience"}</span>
               </Link>
             </div>
           </div>

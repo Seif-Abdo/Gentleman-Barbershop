@@ -185,10 +185,10 @@ export default function PortalQrPage() {
             {/* Instruction Callout */}
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-ivory">
-                نوّرتنا يا باشا.. قولنا رأيك بصراحة!
+                نوّرتنا يا فندم.. نسعد برأيكم وتقييمكم
               </h3>
               <p className="text-xs text-ivory-muted leading-relaxed">
-                امسح الرمز بكاميرا موبايلك في ثواني، ورأيك بيوصل مباشرة لإدارة الصالون.
+                امسح الرمز بكاميرا هاتفك في ثوانٍ، وتقييمك يصل مباشرة لإدارة الصالون.
               </p>
             </div>
 
@@ -207,7 +207,7 @@ export default function PortalQrPage() {
             {/* Tagline / Footer */}
             <div className="space-y-1.5 pt-2 border-t border-border/80">
               <p className="text-xs font-semibold text-gold">
-                أرقى حلاقة ورواقان في مصر ✂️
+                أرقى تجارب الحلاقة والعناية الملكية بالرجل ✂️
               </p>
               <p className="text-[10px] text-ivory-muted font-mono" dir="ltr">
                 {activeBranch.phoneDisplay}
