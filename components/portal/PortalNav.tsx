@@ -15,6 +15,7 @@ import {
   MapPin,
   ChevronDown,
   Sparkles,
+  QrCode,
 } from "lucide-react";
 import { Branch } from "@/config/branches";
 
@@ -85,6 +86,13 @@ export function PortalNav({
       icon: ShieldCheck,
       roles: ["master_admin"],
     },
+    {
+      href: "/portal/qr",
+      labelAr: "طباعة كارت QR",
+      labelEn: "In-Shop QR Stand",
+      icon: QrCode,
+      roles: ["master_admin", "branch_admin"],
+    },
   ];
 
   return (
@@ -148,7 +156,7 @@ export function PortalNav({
                 </span>
                 <span className="text-[10px] text-gold">
                   {isMaster
-                    ? locale === "ar" ? "👑 المدير العام (Master)" : "Master Admin"
+                    ? locale === "ar" ? "👑 المدير العام" : "Master Admin"
                     : locale === "ar" ? "مدير فرع" : "Branch Admin"}
                 </span>
               </div>

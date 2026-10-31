@@ -39,14 +39,6 @@ export function Footer() {
                     : `Branch: ${currentBranch.nameEn} (Click to switch)`}
                 </span>
               </button>
-
-              <Link
-                href={`/${currentBranchId}/feedback/qr`}
-                className="inline-flex items-center gap-1.5 text-xs text-ivory-muted hover:text-gold"
-              >
-                <QrCode className="w-3.5 h-3.5" />
-                <span>{locale === "ar" ? "رمز QR الفرع للطباعة" : "Branch QR Stand"}</span>
-              </Link>
             </div>
           </div>
 

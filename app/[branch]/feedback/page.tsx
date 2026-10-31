@@ -19,6 +19,7 @@ import {
   Phone,
   User,
   MapPin,
+  Heart,
 } from "lucide-react";
 
 export default function BranchFeedbackPage({ params }: { params: Promise<{ branch: string }> }) {
@@ -39,16 +40,16 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Form State
+  // Form State - strictly un-filled by default
   const [clientName, setClientName] = useState<string>("");
   const [clientPhone, setClientPhone] = useState<string>("");
-  const [age, setAge] = useState<string>("26");
+  const [age, setAge] = useState<string>("");
   const [selectedBarber, setSelectedBarber] = useState<string>("");
-  const [barberRating, setBarberRating] = useState<number>(5);
+  const [barberRating, setBarberRating] = useState<number>(0);
   const [barberLikes, setBarberLikes] = useState<string>("");
   const [barberImprovements, setBarberImprovements] = useState<string>("");
 
-  const [shopRating, setShopRating] = useState<number>(5);
+  const [shopRating, setShopRating] = useState<number>(0);
   const [shopLikes, setShopLikes] = useState<string>("");
   const [shopImprovements, setShopImprovements] = useState<string>("");
   const [suggestion, setSuggestion] = useState<string>("");
@@ -70,29 +71,42 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
       .then((list: Barber[]) => {
         if (Array.isArray(list) && list.length > 0) {
           setBarbers(list);
-          if (!selectedBarber && list[0]) {
-            setSelectedBarber(list[0].nameAr);
-          }
         }
       })
       .catch(() => {});
   }, [branchSlug]);
 
-  useEffect(() => {
-    if (!selectedBarber && barbers.length > 0) {
-      setSelectedBarber(barbers[0].nameAr);
-    }
-  }, [barbers, selectedBarber]);
-
-  const derivedAgeGroup = classifyAge(age ? parseInt(age, 10) : null);
-  const ageGroupCfg = AGE_GROUPS[derivedAgeGroup];
+  const parsedAge = age ? parseInt(age, 10) : null;
+  const derivedAgeGroup = classifyAge(parsedAge);
+  const ageGroupCfg = parsedAge ? AGE_GROUPS[derivedAgeGroup] : null;
 
   const handleNext = () => {
-    if (!selectedBarber) {
-      setErrorMsg(locale === "ar" ? "يرجى اختيار اسم الحلاق" : "Please select your barber");
+    setErrorMsg(null);
+    if (!age || parseInt(age, 10) < 5) {
+      setErrorMsg(
+        locale === "ar"
+          ? "ياريت تكتب سنك يا غالي عشان نقدر تقييمك صح."
+          : "Please enter your age to continue."
+      );
       return;
     }
-    setErrorMsg(null);
+    if (!selectedBarber) {
+      setErrorMsg(
+        locale === "ar"
+          ? "اختار الحلاق اللي ظبطلك الحلاقة يا باشا."
+          : "Please select the barber who styled your hair."
+      );
+      return;
+    }
+    if (barberRating === 0) {
+      setErrorMsg(
+        locale === "ar"
+          ? "ياريت تحدد تقييمك بالنجوم لشغل الحلاق."
+          : "Please rate the barber's service (1-5 stars)."
+      );
+      return;
+    }
+
     setStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -105,8 +119,18 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg(null);
+
+    if (shopRating === 0) {
+      setErrorMsg(
+        locale === "ar"
+          ? "ياريت تحدد تقييمك بالنجوم لفرع الصالون ككل."
+          : "Please give an overall star rating for the shop."
+      );
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/submit", {
@@ -114,17 +138,17 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           branchId: branchSlug,
-          clientName,
-          clientPhone,
+          clientName: clientName.trim(),
+          clientPhone: clientPhone.trim(),
           age: age ? parseInt(age, 10) : null,
           barber: selectedBarber,
           barberRating,
-          barberLikes,
-          barberImprovements,
+          barberLikes: barberLikes.trim(),
+          barberImprovements: barberImprovements.trim(),
           shopRating,
-          shopLikes,
-          shopImprovements,
-          suggestion,
+          shopLikes: shopLikes.trim(),
+          shopImprovements: shopImprovements.trim(),
+          suggestion: suggestion.trim(),
           website_url_check: honeypot,
         }),
       });
@@ -150,32 +174,32 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 md:py-16 space-y-8">
       {/* Title & Progress Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-bold uppercase tracking-wider">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/40 text-gold text-xs font-bold uppercase tracking-wider">
           <MapPin className="w-3.5 h-3.5" />
-          <span>{locale === "ar" ? `تقييم فرع ${branch.nameAr}` : `Review ${branch.nameEn} Branch`}</span>
+          <span>{locale === "ar" ? `فرع: ${branch.nameAr}` : `${branch.nameEn} Branch`}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-ivory">
-          {locale === "ar" ? "شاركنا رأيك في 60 ثانية" : "Share Your Experience"}
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-ivory tracking-tight">
+          {locale === "ar" ? "نوّرتنا يا باشا.. قولنا رأيك بصراحة!" : "Share Your Experience with Us"}
         </h1>
-        <p className="text-sm text-ivory-muted">
+        <p className="text-sm sm:text-base text-ivory-muted max-w-xl mx-auto leading-relaxed">
           {locale === "ar"
-            ? `تقييمك يصل مباشرة لإدارة فرع ${branch.nameAr} لمواصلة الارتقاء بالخدمة.`
-            : `Your feedback goes directly to ${branch.nameEn} management.`}
+            ? `رأيك يهمنا من القلب، وبيوصل مباشرة لإدارة فرع ${branch.nameAr} عشان نفضل دايماً رقم واحد في حلاقتك وشياكتك.`
+            : `Your honest feedback goes directly to management so we continually elevate your grooming experience.`}
         </p>
 
         {/* 2-Step Progress Indicator */}
         <div className="pt-6 max-w-md mx-auto">
           <div className="flex items-center justify-between text-xs font-bold mb-2">
-            <span className={step === 1 ? "text-gold" : "text-ivory-muted"}>
-              {locale === "ar" ? "1. تقييم الحلاق" : "1. Barber Review"}
+            <span className={step === 1 ? "text-gold font-extrabold" : "text-ivory-muted"}>
+              {locale === "ar" ? "1. شغل وإيد الحلاق" : "1. Barber Feedback"}
             </span>
-            <span className={step === 2 ? "text-gold" : "text-ivory-muted"}>
-              {locale === "ar" ? "2. تقييم الصالون" : "2. Shop Review"}
+            <span className={step === 2 ? "text-gold font-extrabold" : "text-ivory-muted"}>
+              {locale === "ar" ? "2. قعدة ومستوى المحل" : "2. Shop & Atmosphere"}
             </span>
           </div>
-          <div className="h-2 w-full bg-surface-2 rounded-full overflow-hidden border border-border">
+          <div className="h-2.5 w-full bg-[#181818] rounded-full overflow-hidden border border-border">
             <div
-              className="h-full bg-gold transition-all duration-500 rounded-full"
+              className="h-full bg-gold transition-all duration-500 rounded-full shadow-gold-glow"
               style={{ width: step === 1 ? "50%" : "100%" }}
             />
           </div>
@@ -183,14 +207,14 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
       </div>
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-300 text-sm flex items-center gap-3 animate-shake">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{errorMsg}</span>
+        <div className="p-4 rounded-2xl bg-red-950/50 border border-red-500/60 text-red-200 text-sm flex items-center gap-3 animate-shake shadow-lg">
+          <AlertCircle className="w-5 h-5 shrink-0 text-red-400" />
+          <span className="font-medium">{errorMsg}</span>
         </div>
       )}
 
       {/* Main Wizard Form */}
-      <form onSubmit={handleSubmit} className="gold-card rounded-3xl p-6 sm:p-10 space-y-8">
+      <form onSubmit={handleSubmit} className="gold-card rounded-3xl p-6 sm:p-10 space-y-8 shadow-2xl">
         <input
           type="text"
           name="website_url_check"
@@ -204,26 +228,26 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
         {/* STEP 1: Barber & Personal Info */}
         {step === 1 && (
           <div className="space-y-8 animate-fade-in">
-            {/* Optional Client Name & Phone (Feeds WhatsApp VIP campaigns) */}
+            {/* Optional Client Name & Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-6 border-b border-border">
               <div className="space-y-2">
                 <label className="text-xs sm:text-sm font-semibold text-ivory flex items-center gap-1.5">
                   <User className="w-4 h-4 text-gold" />
-                  <span>{locale === "ar" ? "الاسم (اختياري)" : "Name (Optional)"}</span>
+                  <span>{locale === "ar" ? "اسمك الكريم (اختياري)" : "Name (Optional)"}</span>
                 </label>
                 <input
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder={locale === "ar" ? "اسمك الكريم" : "Your name"}
-                  className="w-full px-4 py-2.5 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                  placeholder={locale === "ar" ? "اسمك يا محترم (مثلاً: أحمد، كريم...)" : "Your name"}
+                  className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs sm:text-sm font-semibold text-ivory flex items-center gap-1.5">
                   <Phone className="w-4 h-4 text-gold" />
-                  <span>{locale === "ar" ? "رقم الهاتف / واتساب (اختياري)" : "Phone / WhatsApp (Optional)"}</span>
+                  <span>{locale === "ar" ? "رقم موبايلك / واتساب (اختياري)" : "Phone / WhatsApp (Optional)"}</span>
                 </label>
                 <input
                   type="tel"
@@ -231,12 +255,12 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                   value={clientPhone}
                   onChange={(e) => setClientPhone(e.target.value)}
                   placeholder="01xxxxxxxxx"
-                  className="w-full px-4 py-2.5 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors font-mono"
                 />
-                <p className="text-[10px] text-ivory-muted">
+                <p className="text-[11px] text-ivory-muted">
                   {locale === "ar"
-                    ? "لتلقي عروض الخصم الملكية وهدايا الـ VIP عبر الواتساب."
-                    : "To receive exclusive VIP offers & discounts via WhatsApp."}
+                    ? "عشان نبعتلك عروض وخصومات وجلسات ترويق مخصوصة على الواتساب."
+                    : "To receive exclusive VIP discounts and grooming treats via WhatsApp."}
                 </p>
               </div>
             </div>
@@ -245,15 +269,17 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-3 pb-6 border-b border-border">
               <div className="flex items-center justify-between">
                 <label className="text-sm sm:text-base font-bold text-ivory flex items-center gap-2">
-                  <span>{locale === "ar" ? "1. سنك كام؟" : "1. What is your age?"}</span>
+                  <span>{locale === "ar" ? "1. سنك كام يا غالي؟" : "1. What is your age?"}</span>
                   <span className="text-gold text-xs">*</span>
                 </label>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${ageGroupCfg.badgeClass}`}
-                >
-                  {locale === "ar" ? ageGroupCfg.labelAr : ageGroupCfg.labelEn} (
-                  {locale === "ar" ? ageGroupCfg.rangeLabelAr : ageGroupCfg.rangeLabelEn})
-                </span>
+                {ageGroupCfg && (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold border ${ageGroupCfg.badgeClass}`}
+                  >
+                    {locale === "ar" ? ageGroupCfg.labelAr : ageGroupCfg.labelEn} (
+                    {locale === "ar" ? ageGroupCfg.rangeLabelAr : ageGroupCfg.rangeLabelEn})
+                  </span>
+                )}
               </div>
               <input
                 type="number"
@@ -261,23 +287,30 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 max="100"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                placeholder={locale === "ar" ? "مثال: 28" : "e.g. 28"}
+                placeholder={locale === "ar" ? "اكتب سنك هنا (مثلاً: 25)" : "e.g. 25"}
                 required
-                className="w-full px-4 py-3 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-base"
+                className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-base placeholder:text-ivory-muted/40 transition-colors"
               />
             </div>
 
-            {/* Question 2: Barber Selection (Only for THIS branch) */}
+            {/* Question 2: Barber Selection */}
             <div className="space-y-4 pb-6 border-b border-border">
-              <label className="text-sm sm:text-base font-bold text-ivory flex items-center gap-2">
-                <Scissors className="w-4 h-4 text-gold" />
-                <span>
+              <div className="space-y-1">
+                <label className="text-sm sm:text-base font-bold text-ivory flex items-center gap-2">
+                  <Scissors className="w-4 h-4 text-gold" />
+                  <span>
+                    {locale === "ar"
+                      ? `2. مين الحلاق اللي حلقت معاه في فرع ${branch.nameAr}؟`
+                      : `2. Which barber styled your hair at ${branch.nameEn}?`}
+                  </span>
+                  <span className="text-gold text-xs">*</span>
+                </label>
+                <p className="text-xs text-ivory-muted">
                   {locale === "ar"
-                    ? `2. اسم حلاق المرة السابقة في فرع ${branch.nameAr}؟`
-                    : `2. Name of your last barber at ${branch.nameEn}?`}
-                </span>
-                <span className="text-gold text-xs">*</span>
-              </label>
+                    ? "اضغط على اسم الحلاق لاختياره:"
+                    : "Tap to select the barber who serviced you:"}
+                </p>
+              </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {barbers.map((barber) => {
@@ -286,25 +319,28 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                     <button
                       type="button"
                       key={barber.id}
-                      onClick={() => setSelectedBarber(barber.nameAr)}
-                      className={`p-3.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 ${
+                      onClick={() => {
+                        setSelectedBarber(barber.nameAr);
+                        setErrorMsg(null);
+                      }}
+                      className={`p-3.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-2 group cursor-pointer ${
                         isSelected
-                          ? "bg-gold/15 border-gold shadow-gold-glow scale-[1.02]"
-                          : "bg-surface-2 border-border hover:border-gold/50 text-ivory"
+                          ? "bg-gold/20 border-gold shadow-gold-glow scale-[1.03]"
+                          : "bg-[#181818] border-border hover:border-gold/50 text-ivory"
                       }`}
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                          isSelected ? "bg-gold text-bg" : "bg-surface text-ivory-muted"
+                        className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-base transition-colors ${
+                          isSelected ? "bg-gold text-surface-dark font-extrabold" : "bg-surface-2 text-gold group-hover:bg-gold/15"
                         }`}
                       >
                         {barber.nameAr[0]}
                       </div>
                       <div>
-                        <p className={`font-bold text-sm ${isSelected ? "text-gold" : "text-ivory"}`}>
+                        <p className={`font-bold text-sm ${isSelected ? "text-gold font-extrabold" : "text-ivory"}`}>
                           {locale === "ar" ? barber.nameAr : barber.nameEn}
                         </p>
-                        <p className="text-[10px] text-ivory-muted line-clamp-1">
+                        <p className="text-[10px] text-ivory-muted line-clamp-1 mt-0.5">
                           {locale === "ar" ? barber.specialtyAr : barber.specialtyEn}
                         </p>
                       </div>
@@ -319,13 +355,15 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
               <div className="flex items-center justify-between">
                 <label className="text-sm sm:text-base font-bold text-ivory">
                   {locale === "ar"
-                    ? `3. قيّم حلاق المرة السابقة فقط (${selectedBarber || "الحلاق"})`
-                    : `3. Rate your last barber (${selectedBarber})`}
+                    ? `3. تقييمك لشغل وإيد الحلاق (${selectedBarber || "الحلاق"}) كان إيه؟`
+                    : `3. Rate your experience with (${selectedBarber || "Barber"})`}
                   <span className="text-gold text-xs ml-1">*</span>
                 </label>
-                <span className="text-xs font-bold text-gold">
-                  {FORM_RATING_SCALES[barberRating]}
-                </span>
+                {barberRating > 0 && (
+                  <span className="text-xs font-bold text-gold">
+                    {FORM_RATING_SCALES[barberRating]}
+                  </span>
+                )}
               </div>
 
               {/* Star Rating Buttons */}
@@ -334,19 +372,22 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                   <button
                     key={stars}
                     type="button"
-                    onClick={() => setBarberRating(stars)}
-                    className="flex flex-col items-center gap-1 group focus:outline-none"
+                    onClick={() => {
+                      setBarberRating(stars);
+                      setErrorMsg(null);
+                    }}
+                    className="flex flex-col items-center gap-1 group focus:outline-none cursor-pointer"
                   >
                     <Star
-                      className={`w-9 h-9 sm:w-12 sm:h-12 transition-transform group-hover:scale-110 ${
+                      className={`w-10 h-10 sm:w-12 sm:h-12 transition-transform group-hover:scale-115 ${
                         stars <= barberRating
-                          ? "text-gold fill-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                          ? "text-gold fill-gold drop-shadow-[0_0_12px_rgba(212,175,55,0.6)]"
                           : "text-border hover:text-gold/50"
                       }`}
                     />
                     <span
                       className={`text-[10px] sm:text-xs font-semibold ${
-                        stars === barberRating ? "text-gold" : "text-ivory-muted"
+                        stars === barberRating ? "text-gold font-bold" : "text-ivory-muted"
                       }`}
                     >
                       {FORM_RATING_SCALES[stars]}
@@ -360,8 +401,8 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "4. إيه اللي عجبك في الحلاق؟ (اختياري)"
-                  : "4. What did you like about the barber? (optional)"}
+                  ? "4. إيه أكتر حاجة عجبتك في إيد الحلاق وشغله؟ (اختياري)"
+                  : "4. What did you like most about the barber? (optional)"}
               </label>
               <textarea
                 rows={2}
@@ -369,10 +410,10 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setBarberLikes(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: دقة التدريج، الأمانة، حسن الاستماع للطلب..."
-                    : "e.g. Sharp lines, polite, listened well..."
+                    ? "مثال: إيده خفيفة، فاهم في التدريج والمقص، محترم وبيسمع الكلام، دقيق في التحديد..."
+                    : "e.g. Precise fade, gentle hands, polite, listened carefully..."
                 }
-                className="w-full px-4 py-3 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
               />
             </div>
 
@@ -380,7 +421,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "5. إيه اللي ممكن يتحسن في الحلاق؟ (اختياري)"
+                  ? "5. إيه اللي الحلاق محتاج ياخد باله منه المرة الجاية؟ (اختياري)"
                   : "5. What could the barber improve? (optional)"}
               </label>
               <textarea
@@ -389,20 +430,20 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setBarberImprovements(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: السرعة، مراعاة طول الشعر المطلوب..."
-                    : "e.g. Pacing, more attention to requested length..."
+                    ? "مثال: مياخدش وقت طويل، يظبط التحديد أكتر، ميركزش في الموبايل..."
+                    : "e.g. Timing, more attention to edge lines, focus on the client..."
                 }
-                className="w-full px-4 py-3 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
               />
             </div>
 
             <button
               type="button"
               onClick={handleNext}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-[1.01]"
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-[1.01] cursor-pointer"
             >
               <span>
-                {locale === "ar" ? "المتابعة لتقييم الفرع" : "Proceed to Shop Review"}
+                {locale === "ar" ? "المتابعة لتقييم المحل والخدمة" : "Proceed to Shop Review"}
               </span>
               <ArrowNext className="w-4 h-4" />
             </button>
@@ -417,13 +458,15 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
               <div className="flex items-center justify-between">
                 <label className="text-sm sm:text-base font-bold text-ivory">
                   {locale === "ar"
-                    ? `6. تقييمك لفرع ${branch.nameAr} ككل`
-                    : `6. Your overall rating of ${branch.nameEn}`}
+                    ? `6. تقييمك العام لفرع ${branch.nameAr} والقعدة والضيافة؟`
+                    : `6. Your overall rating of ${branch.nameEn} branch`}
                   <span className="text-gold text-xs ml-1">*</span>
                 </label>
-                <span className="text-xs font-bold text-gold">
-                  {FORM_RATING_SCALES[shopRating]}
-                </span>
+                {shopRating > 0 && (
+                  <span className="text-xs font-bold text-gold">
+                    {FORM_RATING_SCALES[shopRating]}
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-3 sm:gap-6 py-2">
@@ -431,19 +474,22 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                   <button
                     key={stars}
                     type="button"
-                    onClick={() => setShopRating(stars)}
-                    className="flex flex-col items-center gap-1 group focus:outline-none"
+                    onClick={() => {
+                      setShopRating(stars);
+                      setErrorMsg(null);
+                    }}
+                    className="flex flex-col items-center gap-1 group focus:outline-none cursor-pointer"
                   >
                     <Star
-                      className={`w-9 h-9 sm:w-12 sm:h-12 transition-transform group-hover:scale-110 ${
+                      className={`w-10 h-10 sm:w-12 sm:h-12 transition-transform group-hover:scale-115 ${
                         stars <= shopRating
-                          ? "text-gold fill-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                          ? "text-gold fill-gold drop-shadow-[0_0_12px_rgba(212,175,55,0.6)]"
                           : "text-border hover:text-gold/50"
                       }`}
                     />
                     <span
                       className={`text-[10px] sm:text-xs font-semibold ${
-                        stars === shopRating ? "text-gold" : "text-ivory-muted"
+                        stars === shopRating ? "text-gold font-bold" : "text-ivory-muted"
                       }`}
                     >
                       {FORM_RATING_SCALES[stars]}
@@ -457,8 +503,8 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? `7. إيه اللي عجبك في فرع ${branch.nameAr}؟ (اختياري)`
-                  : "7. What did you like about the shop? (optional)"}
+                  ? `7. إيه اللي عجبك في المكان والفرع؟ (اختياري)`
+                  : "7. What did you enjoy about the shop? (optional)"}
               </label>
               <textarea
                 rows={2}
@@ -466,10 +512,10 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setShopLikes(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: النظافة، الديكور، المعاملة والضيافة، تعقيم الفوط..."
-                    : "e.g. Cleanliness, atmosphere, hospitality, fresh towels..."
+                    ? "مثال: النظافة والريحة الحلوة، التكييف، حسن الاستقبال، الفوط السخنة، شياكة الديكور..."
+                    : "e.g. Hygiene, welcoming staff, cool AC, luxury vibe, hot towels..."
                 }
-                className="w-full px-4 py-3 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
               />
             </div>
 
@@ -477,8 +523,8 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "8. إيه اللي ممكن يتحسن في المحل؟ (اختياري)"
-                  : "8. What could the shop improve? (optional)"}
+                  ? "8. في أي حاجة ضايقتك في المكان أو محتاجة تظبيط؟ (اختياري)"
+                  : "8. Anything you'd like us to improve in the shop? (optional)"}
               </label>
               <textarea
                 rows={2}
@@ -486,10 +532,10 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setShopImprovements(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "مثال: وقت الانتظار، درجة التكييف، مواعيد الحجز..."
-                    : "e.g. Waiting time, AC temperature, queue management..."
+                    ? "مثال: وقت الانتظار والدور، درجة التكييف، مواعيد الزحمة..."
+                    : "e.g. Waiting time, AC temperature, rush hours management..."
                 }
-                className="w-full px-4 py-3 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
               />
             </div>
 
@@ -497,8 +543,8 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
             <div className="space-y-2 pb-6 border-b border-border">
               <label className="text-xs sm:text-sm font-semibold text-ivory">
                 {locale === "ar"
-                  ? "9. أضف اقتراحك للحصول على أفضل خدمة (اختياري)"
-                  : "9. Your suggestion for the best service (optional)"}
+                  ? "9. نفسك نوفر إيه جديد في صالون جنتل مان؟ (اختياري)"
+                  : "9. Suggestions for services or perks you'd love to see (optional)"}
               </label>
               <textarea
                 rows={2}
@@ -506,20 +552,20 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 onChange={(e) => setSuggestion(e.target.value)}
                 placeholder={
                   locale === "ar"
-                    ? "أي فكرة جديدة تحب تشوفها في صالون جنتل مان..."
-                    : "Any ideas or services you'd love to see..."
+                    ? "أي فكرة أو خدمة تحب تلاقيها المرة الجاية... صالونك وتحت أمرك يا باشا!"
+                    : "Any new treatment, grooming service or perk you'd love to enjoy..."
                 }
-                className="w-full px-4 py-3 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#181818] border border-border focus:border-gold focus:outline-none text-ivory text-sm placeholder:text-ivory-muted/40 transition-colors"
               />
             </div>
 
             {/* Privacy notice */}
-            <div className="p-3.5 rounded-xl bg-surface-2 border border-border text-[11px] text-ivory-muted flex items-start gap-2.5 leading-relaxed">
+            <div className="p-4 rounded-xl bg-[#181818] border border-border text-xs text-ivory-muted flex items-start gap-3 leading-relaxed">
               <Shield className="w-4 h-4 text-gold shrink-0 mt-0.5" />
               <span>
                 {locale === "ar"
-                  ? "يتم استخدام إجاباتك حصرياً لتطوير وتجويد خدمات الصالون وتقديم عروض ملكية لعملائنا الكرام وفقاً لأعلى معايير الخصوصية."
-                  : "Your responses are securely processed by management to improve shop standards and provide VIP client rewards."}
+                  ? "إجاباتك سرية تماماً وتصل مباشرة لإدارة صالون جنتل مان لمتابعة الجودة وتقديم أفضل تجربة لعملائنا."
+                  : "Your answers are processed confidentially by Gentleman management to ensure top-notch service."}
               </span>
             </div>
 
@@ -529,7 +575,7 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
                 type="button"
                 onClick={handlePrev}
                 disabled={loading}
-                className="px-6 py-4 rounded-xl text-sm font-semibold border border-border hover:border-gold/50 bg-surface-2 text-ivory flex items-center gap-2"
+                className="px-6 py-4 rounded-xl text-sm font-semibold border border-border hover:border-gold/50 bg-[#181818] text-ivory flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <ArrowPrev className="w-4 h-4" />
                 <span>{locale === "ar" ? "السابق" : "Back"}</span>
@@ -538,14 +584,14 @@ export default function BranchFeedbackPage({ params }: { params: Promise<{ branc
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-[1.01] disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-[1.01] disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
                   <span>{locale === "ar" ? "جاري الحفظ..." : "Saving..."}</span>
                 ) : (
                   <>
                     <CheckCircle2 className="w-5 h-5" />
-                    <span>{locale === "ar" ? "إرسال التقييم" : "Submit Review"}</span>
+                    <span>{locale === "ar" ? "إرسال التقييم ✂️" : "Submit Review"}</span>
                   </>
                 )}
               </button>

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "admin-master",
+    "username": "master",
+    "name": "مدير عام الصالون (Owner)",
+    "role": "master_admin",
+    "branchId": "all",
+    "password": "gentleman2026",
+    "createdAt": "2026-10-31T12:11:16.704Z"
+  },
+  {
+    "id": "admin-zahraa",
+    "username": "admin_zahraa",
+    "name": "مدير فرع زهراء المعادي",
+    "role": "branch_admin",
+    "branchId": "zahraa-maadi",
+    "password": "zahraa2026",
+    "createdAt": "2026-10-31T12:11:16.705Z"
+  },
+  {
+    "id": "admin-nasrcity",
+    "username": "admin_nasrcity",
+    "name": "مدير فرع مدينة نصر (حسن المأمون)",
+    "role": "branch_admin",
+    "branchId": "nasr-city",
+    "password": "nasr2026",
+    "createdAt": "2026-10-31T12:11:16.705Z"
+  },
+  {
+    "id": "admin-newmaadi",
+    "username": "admin_newmaadi",
+    "name": "مدير فرع مدينة نصر (أبوداود الظاهري)",
+    "role": "branch_admin",
+    "branchId": "new-maadi",
+    "password": "maadi2026",
+    "createdAt": "2026-10-31T12:11:16.705Z"
+  }
+]

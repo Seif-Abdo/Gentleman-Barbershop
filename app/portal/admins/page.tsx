@@ -270,12 +270,12 @@ export default function AdminsManagementPage() {
             </p>
             <p>
               {locale === "ar"
-                ? "• المدير العام (Master Admin): يمتلك صلاحية كاملة على جميع الفروع، حملات الواتساب، وإدارة الفروع والحلاقين والمديرين."
+                ? "• المدير العام: يمتلك صلاحية كاملة على جميع الفروع، حملات الواتساب، وإدارة الفروع والحلاقين والمديرين."
                 : "• Master Admin: Full unrestricted access to all branches, WhatsApp campaigns, staff, and account management."}
             </p>
             <p>
               {locale === "ar"
-                ? "• مدير الفرع (Branch Admin): مقيد بحصر الصلاحيات على الفرع المخصص له فقط؛ لا يستطيع الوصول لباقي الفروع أو إرسال حملات الواتساب."
+                ? "• مدير الفرع: مقيد بحصر الصلاحيات على الفرع المخصص له فقط؛ لا يستطيع الوصول لباقي الفروع أو إرسال حملات الواتساب."
                 : "• Branch Admin: Strictly restricted to their assigned branch data only; cannot view other branches or manage campaigns."}
             </p>
           </div>
@@ -339,7 +339,7 @@ export default function AdminsManagementPage() {
                         {adm.role === "master_admin" ? (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gold/15 text-gold border border-gold/40 shadow-gold-glow">
                             <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>{locale === "ar" ? "مدير عام (Master)" : "Master Admin"}</span>
+                            <span>{locale === "ar" ? "مدير عام" : "Master Admin"}</span>
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-surface-dark text-ivory-muted border border-border">
@@ -424,7 +424,7 @@ export default function AdminsManagementPage() {
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                    className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory placeholder:text-ivory-muted/40 focus:border-gold outline-none focus:ring-1 focus:ring-gold/30 transition-all"
                     placeholder="e.g. سيف أحمد / Seif Ahmed"
                     required
                   />
@@ -441,7 +441,7 @@ export default function AdminsManagementPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, username: e.target.value.toLowerCase().trim() })
                     }
-                    className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none font-mono"
+                    className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory placeholder:text-ivory-muted/40 focus:border-gold outline-none font-mono focus:ring-1 focus:ring-gold/30 transition-all disabled:opacity-50"
                     placeholder="e.g. admin_nasr"
                     required
                   />
@@ -461,7 +461,7 @@ export default function AdminsManagementPage() {
                     type="password"
                     value={editForm.password || ""}
                     onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
-                    className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none font-mono"
+                    className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory placeholder:text-ivory-muted/40 focus:border-gold outline-none font-mono focus:ring-1 focus:ring-gold/30 transition-all"
                     placeholder="••••••••"
                     required={isNew}
                   />
@@ -474,13 +474,13 @@ export default function AdminsManagementPage() {
                   <select
                     value={editForm.role}
                     onChange={(e) => setEditForm({ ...editForm, role: e.target.value as AdminRole })}
-                    className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                    className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none cursor-pointer focus:ring-1 focus:ring-gold/30 transition-all"
                   >
-                    <option value="branch_admin">
-                      {locale === "ar" ? "مدير فرع (Branch Admin)" : "Branch Admin"}
+                    <option value="branch_admin" className="bg-[#181818] text-ivory py-1">
+                      {locale === "ar" ? "مدير فرع" : "Branch Admin"}
                     </option>
-                    <option value="master_admin">
-                      {locale === "ar" ? "مدير عام (Master Admin)" : "Master Admin"}
+                    <option value="master_admin" className="bg-[#181818] text-ivory py-1">
+                      {locale === "ar" ? "مدير عام" : "Master Admin"}
                     </option>
                   </select>
                 </div>
@@ -493,10 +493,10 @@ export default function AdminsManagementPage() {
                     <select
                       value={editForm.branchId}
                       onChange={(e) => setEditForm({ ...editForm, branchId: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none cursor-pointer focus:ring-1 focus:ring-gold/30 transition-all"
                     >
                       {branches.map((b) => (
-                        <option key={b.id} value={b.id}>
+                        <option key={b.id} value={b.id} className="bg-[#181818] text-ivory py-1">
                           {locale === "ar" ? b.nameAr : b.nameEn}
                         </option>
                       ))}

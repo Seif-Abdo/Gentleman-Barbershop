@@ -85,7 +85,7 @@ export default function PortalLoginPage() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="master"
+                placeholder={locale === "ar" ? "اسم المستخدم" : "Username"}
                 className="w-full px-4 py-3 pl-10 rounded-xl bg-surface-2 border border-border focus:border-gold focus:outline-none text-ivory text-sm"
               />
               <User className="w-4 h-4 text-ivory-muted absolute top-3.5 left-3.5 pointer-events-none" />
@@ -124,27 +124,6 @@ export default function PortalLoginPage() {
             )}
           </button>
         </form>
-
-        {/* Demo Credentials Quick Guide */}
-        <div className="pt-4 border-t border-border/80 text-[11px] text-ivory-muted space-y-1.5 bg-surface-2/40 p-3.5 rounded-xl">
-          <p className="font-bold text-gold text-xs">
-            {locale === "ar" ? "حسابات النظام المسجلة (للاختبار):" : "Pre-configured Credentials:"}
-          </p>
-          <div className="space-y-1 font-mono text-[10px]">
-            <p>
-              <span className="text-ivory font-bold">المدير العام (Master Admin):</span> master / gentleman2026
-            </p>
-            <p>
-              <span className="text-ivory">مدير زهراء المعادي:</span> admin_zahraa / zahraa2026
-            </p>
-            <p>
-              <span className="text-ivory">مدير مدينة نصر (حسن المأمون):</span> admin_nasrcity / nasr2026
-            </p>
-            <p>
-              <span className="text-ivory">مدير مدينة نصر (أبوداود الظاهري):</span> admin_newmaadi / maadi2026
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

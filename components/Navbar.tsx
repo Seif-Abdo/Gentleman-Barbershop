@@ -162,13 +162,6 @@ export function Navbar() {
               <MessageSquareQuote className="w-4 h-4" />
               <span>{t("nav.feedback")}</span>
             </Link>
-            <Link
-              href={`/${currentBranchId}/feedback/qr`}
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-xs text-gold underline text-center pt-2"
-            >
-              {t("nav.qr")}
-            </Link>
           </div>
         </div>
       )}

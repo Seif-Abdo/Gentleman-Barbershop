@@ -19,7 +19,7 @@ export const DEFAULT_BARBERS: Barber[] = [
     branchId: "zahraa-maadi",
     nameAr: "سعيد",
     nameEn: "Saeed",
-    titleAr: "كبير الحلاقين (Master Barber)",
+    titleAr: "كبير الحلاقين",
     titleEn: "Master Barber",
     experienceYears: 12,
     specialtyAr: "القصات الكلاسيكية وتحديد اللحية الملكي",

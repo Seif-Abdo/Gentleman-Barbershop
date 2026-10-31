@@ -109,9 +109,9 @@ const SEED_FEEDBACKS = [
     age: 28,
     barber: "سعيد",
     barberRating: 5,
-    barberLikes: "سعيد فنان وأسلوبه راقي جداً في القص وتحديد اللحية.",
+    barberLikes: "سعيد أستاذ ورئيس قسم، تحديد الدقن بالمسطرة والقعدة مريحة أوي.",
     shopRating: 5,
-    shopLikes: "المحل نظيف جداً وفخم والضيافة ممتازة.",
+    shopLikes: "المحل نظيف جداً وفخم والضيافة والقهوة ممتازة.",
     suggestion: "توفير دفع بفيزا أو انستاباي.",
   },
   {
@@ -121,9 +121,9 @@ const SEED_FEEDBACKS = [
     age: 17,
     barber: "احمد",
     barberRating: 5,
-    barberLikes: "أحسن تدريج فيد عملته، فاهم الموضة صح.",
+    barberLikes: "أحمد إيده تتلف في حرير، أحسن تدريج فيد شبابي عملته.",
     shopRating: 4,
-    shopLikes: "ديكور شيك وموسيقى هادية.",
+    shopLikes: "ديكور شيك وموسيقى هادية ورايقة.",
     suggestion: "شواحن للهواتف في صالة الانتظار.",
   },
   {
@@ -133,9 +133,9 @@ const SEED_FEEDBACKS = [
     age: 56,
     barber: "طارق",
     barberRating: 4,
-    barberLikes: "حلاقة ممتازة بالموس الساخن وأدب كبير.",
-    shopRating: 3,
-    shopLikes: "المحل نظيف ولكن كان هناك انتظار نصف ساعة.",
+    barberLikes: "حلاقة ممتازة بالموس الساخن وأدب وذوق كبير.",
+    shopRating: 4,
+    shopLikes: "المحل نظيف جداً والتعقيم ممتاز أمام عيني.",
     suggestion: "الالتزام بالمواعيد المسبقة لكبار السن.",
   },
   {
@@ -147,11 +147,35 @@ const SEED_FEEDBACKS = [
     barberRating: 5,
     barberLikes: "باقة العريس مع محمود كانت خيالية وريحتني قبل الفرح.",
     shopRating: 5,
-    shopLikes: "أفضل خدمة حلاقة في زهراء المعادي.",
+    shopLikes: "أفضل خدمة حلاقة في زهراء المعادي بلا منازع.",
     suggestion: "استمروا على هذا المستوى الرائع.",
   },
+  {
+    branchId: "zahraa-maadi",
+    clientName: "عمرو عزت",
+    clientPhone: "+201022334455",
+    age: 24,
+    barber: "محمد",
+    barberRating: 5,
+    barberLikes: "محمد فنان في التيمبر والخطوط، قصة على الفرازة.",
+    shopRating: 5,
+    shopLikes: "الريحة والنضافة في المكان تشرح القلب.",
+    suggestion: "ياريت تفتحوا بدري يوم الجمعة.",
+  },
+  {
+    branchId: "zahraa-maadi",
+    clientName: "خالد منصور",
+    clientPhone: "+201133445566",
+    age: 39,
+    barber: "علي",
+    barberRating: 5,
+    barberLikes: "علي صبغلي الدقن صبغة طبيعية متفرقة ومظبوطة جداً.",
+    shopRating: 4,
+    shopLikes: "الاستقبال بشوش وسريع.",
+    suggestion: "زيادة مجلات أو شاشة لعرض المباريات.",
+  },
 
-  // Nasr City
+  // Nasr City (حسن المأمون)
   {
     branchId: "nasr-city",
     clientName: "أحمد سراج",
@@ -161,7 +185,7 @@ const SEED_FEEDBACKS = [
     barberRating: 5,
     barberLikes: "محمد رفاعي دقيق جداً في التدرج والقصة طلعت مضبوطة بالملي.",
     shopRating: 5,
-    shopLikes: "فرع مدينة نصر تصميمه حديث ومكانه مميز في عباس العقاد.",
+    shopLikes: "فرع مدينة نصر تصميمه حديث ومكانه مميز في حسن المأمون.",
     suggestion: "ياريت توفروا تطبيق حجز أونلاين.",
   },
   {
@@ -171,10 +195,10 @@ const SEED_FEEDBACKS = [
     age: 31,
     barber: "وليد جمال",
     barberRating: 5,
-    barberLikes: "وليد متمكن في نحت اللحية بالموس وشغله مريح جداً.",
-    shopRating: 4,
+    barberLikes: "وليد متمكن في نحت اللحية بالموس وشغله مريح ورايق جداً.",
+    shopRating: 5,
     shopLikes: "كراسي مريحة وأدوات معقمة أمام العميل.",
-    suggestion: "توفير قهوة لزوار الفرع.",
+    suggestion: "توفير قهوة تركي لزوار الفرع.",
   },
   {
     branchId: "nasr-city",
@@ -183,10 +207,10 @@ const SEED_FEEDBACKS = [
     age: 19,
     barber: "عمر زين",
     barberRating: 5,
-    barberLikes: "عمر فنان في القصات الشبابية والمودرن.",
+    barberLikes: "عمر فنان في القصات الشبابية والمودرن والكيرلي.",
     shopRating: 5,
     shopLikes: "الفرع سريع ومفيش انتظار طويل.",
-    suggestion: "عمل خصم للطلاب.",
+    suggestion: "عمل خصم للطلبة والشباب.",
   },
   {
     branchId: "nasr-city",
@@ -194,11 +218,11 @@ const SEED_FEEDBACKS = [
     clientPhone: "+201288990011",
     age: 48,
     barber: "محمد محمود",
-    barberRating: 4,
-    barberLikes: "محمد محمود مريح في التعامل وأخلاقه عالية.",
+    barberRating: 5,
+    barberLikes: "محمد محمود مريح في التعامل وأخلاقه عالية وجلسة البخار تحفة.",
     shopRating: 4,
-    shopLikes: "جلسة البخار كانت ممتازة وتستحق.",
-    suggestion: "تخفيض صوت الموسيقى في المساء.",
+    shopLikes: "جلسة البخار كانت ممتازة وتستحق التجربة.",
+    suggestion: "تخفيض صوت الموسيقى شوية في المساء.",
   },
   {
     branchId: "nasr-city",
@@ -206,16 +230,26 @@ const SEED_FEEDBACKS = [
     clientPhone: "+201011223344",
     age: 27,
     barber: "اسلام ماهر",
-    barberRating: 2,
-    barberLikes: "قصة عادية",
-    barberImprovements: "كان مستعجل شوية عشان زحمة الجمعة.",
+    barberRating: 4,
+    barberLikes: "إسلام شاطر ومحترم بس كان مستعجل شوية عشان زحمة الجمعة.",
     shopRating: 3,
-    shopLikes: "المكان نظيف",
-    shopImprovements: "تنظيم وقت الانتظار أيام الإجازات.",
-    suggestion: "زيادة عدد الكراسي في أوقات الذروة.",
+    shopLikes: "المكان نظيف جداً.",
+    suggestion: "تنظيم وقت الانتظار أيام الإجازات وزيادة كراسي الانتظار.",
+  },
+  {
+    branchId: "nasr-city",
+    clientName: "محمود الجيار",
+    clientPhone: "+201277665544",
+    age: 33,
+    barber: "محمد رفاعي",
+    barberRating: 5,
+    barberLikes: "محمد رفاعي مقص دهبي، حلاقة الشعر والدقن معاه متعة وباشوات.",
+    shopRating: 5,
+    shopLikes: "نضافة عالية وكل حلاق لابس يونيفورم شيك.",
+    suggestion: "عايزين فرع في التجمع.",
   },
 
-  // Branch 3: Nasr City (Abou Dawoud El Zahery)
+  // Branch 3: Nasr City (أبوداود الظاهري / new-maadi)
   {
     branchId: "new-maadi",
     clientName: "شريف النجار",
@@ -225,7 +259,7 @@ const SEED_FEEDBACKS = [
     barberRating: 5,
     barberLikes: "أحمد سيد أستاذ في المقص الكلاسيكي، راحة نفسية وشغل عالي.",
     shopRating: 5,
-    shopLikes: "فرع أبوداود الظاهري هادئ جداً وفخم ونظيف للغاية.",
+    shopLikes: "فرع معز الدولة هادئ جداً وفخم ونظيف للغاية.",
     suggestion: "توفير مساحات انتظار خارجية.",
   },
   {
@@ -235,7 +269,7 @@ const SEED_FEEDBACKS = [
     age: 51,
     barber: "خالد سيد",
     barberRating: 5,
-    barberLikes: "خالد إيده خفيفة جداً في حلاقة الذقن بالفوط الساخنة.",
+    barberLikes: "خالد إيده خفيفة جداً في حلاقة الذقن بالفوط الساخنة والساقعة.",
     shopRating: 5,
     shopLikes: "التعقيم في الفرع على أعلى مستوى عالمي.",
     suggestion: "كل شيء ممتاز ربنا يوفقكم.",
@@ -247,10 +281,34 @@ const SEED_FEEDBACKS = [
     age: 22,
     barber: "عبدالله",
     barberRating: 5,
-    barberLikes: "عبدالله فنان في جلسات تنظيف البشرة وتحديد الذقن.",
+    barberLikes: "عبدالله فنان في جلسات تنظيف البشرة وتحديد الذقن والستايل الكيرلي.",
     shopRating: 5,
     shopLikes: "ديكور الأسود والذهب في الفرع يفتح النفس.",
     suggestion: "توفير باقات اشتراك شهرية.",
+  },
+  {
+    branchId: "new-maadi",
+    clientName: "كريم بدوي",
+    clientPhone: "+201066554433",
+    age: 29,
+    barber: "احمد سيد",
+    barberRating: 5,
+    barberLikes: "أحمد سيد زوق وأخلاق وتدريج ممتاز ولا غلطة.",
+    shopRating: 5,
+    shopLikes: "المكان رايق ومفيش دوشة، تجربة VIP حقيقية.",
+    suggestion: "كود خصم للزيارة التانية.",
+  },
+  {
+    branchId: "new-maadi",
+    clientName: "هشام صبري",
+    clientPhone: "+201188776655",
+    age: 44,
+    barber: "خالد سيد",
+    barberRating: 5,
+    barberLikes: "خالد حلاق محترف بمعنى الكلمة، نضافة وسرعة ودقة.",
+    shopRating: 5,
+    shopLikes: "كل حاجة ممتازة وريحة الكولونيا تحفة.",
+    suggestion: "توفير حجز بالتليفون أو الواتساب.",
   },
 ];
 
@@ -318,13 +376,21 @@ async function ensureDbInitialized(): Promise<void> {
 
   // 6. Feedbacks
   try {
-    await fs.access(FEEDBACKS_FILE);
+    const raw = await fs.readFile(FEEDBACKS_FILE, "utf-8");
+    const parsed: NormalizedFeedback[] = JSON.parse(raw);
+    const hasBranches =
+      parsed.length >= 10 &&
+      parsed.some((f) => f.branchId === "nasr-city") &&
+      parsed.some((f) => f.branchId === "new-maadi");
+    if (!hasBranches) {
+      throw new Error("Reseed multi-branch feedbacks");
+    }
   } catch {
     const now = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
     const initial: NormalizedFeedback[] = SEED_FEEDBACKS.map((seed, idx) => {
-      const daysAgo = idx % 25;
-      const time = new Date(now - daysAgo * dayMs - idx * 100000).toISOString();
+      const daysAgo = idx % 28;
+      const time = new Date(now - daysAgo * dayMs - idx * 3600000).toISOString();
       return normalizeRecord({
         id: `seed-${idx + 1}`,
         timestamp: time,

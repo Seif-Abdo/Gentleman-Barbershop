@@ -389,7 +389,7 @@ export default function BarbersManagementPage() {
                       onChange={(e) =>
                         setEditForm({ ...editForm, id: e.target.value.toLowerCase().trim() })
                       }
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                       required
                     />
                   </div>
@@ -401,11 +401,11 @@ export default function BarbersManagementPage() {
                     <select
                       value={editForm.branchId || ""}
                       onChange={(e) => setEditForm({ ...editForm, branchId: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none cursor-pointer"
                       required
                     >
                       {branches.map((b) => (
-                        <option key={b.id} value={b.id}>
+                        <option key={b.id} value={b.id} className="bg-[#181818] text-ivory py-1">
                           {locale === "ar" ? b.nameAr : b.nameEn}
                         </option>
                       ))}
@@ -423,7 +423,7 @@ export default function BarbersManagementPage() {
                       dir="rtl"
                       value={editForm.nameAr || ""}
                       onChange={(e) => setEditForm({ ...editForm, nameAr: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                       placeholder="مثال: محمد رفاعي"
                       required
                     />
@@ -437,7 +437,7 @@ export default function BarbersManagementPage() {
                       type="text"
                       value={editForm.nameEn || ""}
                       onChange={(e) => setEditForm({ ...editForm, nameEn: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                       placeholder="e.g. Mohamed Refaie"
                       required
                     />
@@ -454,8 +454,8 @@ export default function BarbersManagementPage() {
                       dir="rtl"
                       value={editForm.titleAr || ""}
                       onChange={(e) => setEditForm({ ...editForm, titleAr: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
-                      placeholder="مثال: كبير الحلاقين (Master Barber)"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
+                      placeholder="مثال: كبير الحلاقين"
                       required
                     />
                   </div>
@@ -468,7 +468,7 @@ export default function BarbersManagementPage() {
                       type="text"
                       value={editForm.titleEn || ""}
                       onChange={(e) => setEditForm({ ...editForm, titleEn: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                       placeholder="e.g. Master Barber"
                       required
                     />
@@ -487,7 +487,7 @@ export default function BarbersManagementPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, experienceYears: parseInt(e.target.value) || 1 })
                     }
-                    className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                    className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                     required
                   />
                 </div>
@@ -502,7 +502,7 @@ export default function BarbersManagementPage() {
                       dir="rtl"
                       value={editForm.specialtyAr || ""}
                       onChange={(e) => setEditForm({ ...editForm, specialtyAr: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                       placeholder="مثال: تدريج الفيد والقصات الكلاسيكية"
                       required
                     />
@@ -516,7 +516,7 @@ export default function BarbersManagementPage() {
                       rows={2}
                       value={editForm.specialtyEn || ""}
                       onChange={(e) => setEditForm({ ...editForm, specialtyEn: e.target.value })}
-                      className="w-full bg-surface-dark border border-border rounded-lg px-3 py-2 text-sm text-ivory focus:border-gold outline-none"
+                      className="w-full bg-[#181818] border border-border/80 rounded-xl px-4 py-2.5 text-sm text-ivory focus:border-gold outline-none"
                       placeholder="e.g. Skin fade & classic beard styling"
                       required
                     />

@@ -126,7 +126,7 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
               <MessageSquareQuote className="w-5 h-5" />
               <span>
                 {locale === "ar"
-                  ? `شاركنا رأيك في فرع ${currentBranch.nameAr}`
+                  ? `قولنا رأيك في فرع ${currentBranch.nameAr}`
                   : `Review ${currentBranch.nameEn}`}
               </span>
               <ArrowIcon className="w-4 h-4" />
@@ -330,16 +330,10 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href={`/${branchSlug}/feedback`}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold bg-gold hover:bg-gold-light text-bg shadow-gold-glow transition-all hover:scale-105"
               >
                 <MessageSquareQuote className="w-4 h-4" />
-                <span>{locale === "ar" ? "ابدأ الاستبيان الآن" : "Start Survey Now"}</span>
-              </Link>
-              <Link
-                href={`/${branchSlug}/feedback/qr`}
-                className="text-xs text-ivory-muted hover:text-gold underline"
-              >
-                {locale === "ar" ? "رمز QR الخاص بالفرع" : "In-Shop QR Stand"}
+                <span>{locale === "ar" ? "قولنا رأيك يا باشا" : "Share Your Experience"}</span>
               </Link>
             </div>
           </div>
