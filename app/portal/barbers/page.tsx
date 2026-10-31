@@ -202,9 +202,9 @@ export default function BarbersManagementPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleAddNew}
-              className="px-5 py-2.5 bg-gradient-gold text-surface-dark font-bold text-sm rounded-lg hover:shadow-gold transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-gold hover:bg-gold-light text-[#0B0B0B] font-bold text-sm rounded-xl shadow-gold-glow hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#0B0B0B]" />
               <span>{locale === "ar" ? "إضافة حلاق جديد" : "Add New Barber"}</span>
             </button>
           </div>
@@ -548,9 +548,9 @@ export default function BarbersManagementPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-lg bg-gradient-gold text-surface-dark font-bold text-sm hover:shadow-gold flex items-center gap-2"
+                    className="px-5 py-2 rounded-xl bg-gold hover:bg-gold-light text-[#0B0B0B] font-bold text-sm shadow-gold-glow flex items-center gap-2 cursor-pointer transition-all"
                   >
-                    <Save className="w-4 h-4" />
+                    <Save className="w-4 h-4 text-[#0B0B0B]" />
                     <span>{locale === "ar" ? "حفظ التغييرات" : "Save Changes"}</span>
                   </button>
                 </div>

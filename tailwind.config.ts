@@ -48,6 +48,7 @@ const config: Config = {
       },
       backgroundImage: {
         "gold-gradient": "linear-gradient(135deg, #9C7A1E 0%, #E8CB6E 50%, #D4AF37 100%)",
+        "gradient-gold": "linear-gradient(135deg, #D4AF37 0%, #F5E096 50%, #D4AF37 100%)",
         "gold-shimmer": "linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent)",
         "surface-gradient": "linear-gradient(180deg, rgba(28, 28, 28, 0.8) 0%, rgba(20, 20, 20, 0.95) 100%)",
       },

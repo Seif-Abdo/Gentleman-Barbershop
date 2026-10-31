@@ -145,9 +145,9 @@ export default function PortalQrPage() {
 
             <button
               onClick={handlePrint}
-              className="px-5 py-2.5 rounded-xl bg-gradient-gold text-surface-dark text-xs font-bold shadow-gold-glow flex items-center gap-2 hover:opacity-95 transition-all"
+              className="px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-[#0B0B0B] text-xs font-bold shadow-gold-glow flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
             >
-              <Printer className="w-4 h-4" />
+              <Printer className="w-4 h-4 text-[#0B0B0B]" />
               <span>{locale === "ar" ? "طباعة الكارت فوراً" : "Print Stand Card"}</span>
             </button>
           </div>
