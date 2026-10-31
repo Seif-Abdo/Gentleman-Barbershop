@@ -533,7 +533,7 @@ export default function BarbersManagementPage() {
                   />
                   <label htmlFor="isActive" className="text-sm font-medium text-ivory cursor-pointer">
                     {locale === "ar"
-                      ? "الحلاق نشط ومتاح في قائمة الحجز والتقييم"
+                      ? "الحلاق نشط ومتاح في قائمة الحلاقين والتقييم"
                       : "Barber is active and available for client selection"}
                   </label>
                 </div>

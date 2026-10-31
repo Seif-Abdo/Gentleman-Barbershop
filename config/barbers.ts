@@ -149,14 +149,14 @@ export const DEFAULT_BARBERS: Barber[] = [
     isActive: true,
   },
 
-  // --- Branch 3: New Maadi ---
+  // --- Branch 3: Nasr City (Abou Dawoud El Zahery) ---
   {
     id: "ahmed-sayed",
     branchId: "new-maadi",
     nameAr: "احمد سيد",
     nameEn: "Ahmed Sayed",
-    titleAr: "كبير حلاقي فرع المعادي الجديدة",
-    titleEn: "Lead Barber - New Maadi",
+    titleAr: "كبير حلاقي فرع مدينة نصر (أبوداود الظاهري)",
+    titleEn: "Lead Barber - Nasr City (Abou Dawoud)",
     experienceYears: 10,
     specialtyAr: "القصات الدقيقة والتصميم الكلاسيكي الفاخر",
     specialtyEn: "Precision scissor cut & luxury styling",

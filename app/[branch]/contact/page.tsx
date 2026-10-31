@@ -82,7 +82,7 @@ export default function BranchContactPage({ params }: { params: Promise<{ branch
               <Phone className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold text-ivory">
-              {locale === "ar" ? "الاتصال والحجز" : "Phone & WhatsApp"}
+              {locale === "ar" ? "الاتصال وخدمة العملاء" : "Direct Phone & WhatsApp"}
             </h3>
             <p className="text-sm text-ivory-muted font-mono" dir="ltr">
               {branch.phoneDisplay}
@@ -90,8 +90,8 @@ export default function BranchContactPage({ params }: { params: Promise<{ branch
             <a
               href={`https://wa.me/${branch.whatsapp}?text=${encodeURIComponent(
                 locale === "ar"
-                  ? `مرحباً صالون جنتل مان (فرع ${branch.nameAr})، أود حجز موعد حلاقة.`
-                  : `Hello Gentleman Barbershop (${branch.nameEn}), I would like to book an appointment.`
+                  ? `مرحباً صالون جنتل مان (فرع ${branch.nameAr})، أود الاستفسار عن الخدمات المتاحة.`
+                  : `Hello Gentleman Barbershop (${branch.nameEn}), I would like to inquire about available services.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"

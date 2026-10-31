@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, use } from "react";
 import { useLanguage } from "@/components/LanguageContext";
-import { SERVICES } from "@/content/services";
+import { getServicesForBranch, ServiceItem } from "@/content/services";
 import { DEFAULT_BRANCHES, Branch } from "@/config/branches";
-import { Clock, MessageCircle, Scissors, Sparkles } from "lucide-react";
+import { Clock, Scissors, Sparkles, ShieldCheck } from "lucide-react";
 
 export default function BranchServicesPage({ params }: { params: Promise<{ branch: string }> }) {
   const resolvedParams = use(params);
@@ -26,18 +26,21 @@ export default function BranchServicesPage({ params }: { params: Promise<{ branc
       .catch(() => {});
   }, [branchSlug]);
 
+  const branchServices = getServicesForBranch(branchSlug);
+
   const categories = [
     { id: "all", labelAr: "جميع الخدمات", labelEn: "All Services" },
     { id: "hair", labelAr: "قصات الشعر", labelEn: "Haircuts" },
     { id: "beard", labelAr: "اللحية والذقن", labelEn: "Beard & Shave" },
-    { id: "package", labelAr: "باقات VIP الشاملة", labelEn: "VIP Packages" },
+    { id: "package", labelAr: "باقات شاملة", labelEn: "Combos & Packages" },
     { id: "treatment", labelAr: "العناية والبشرة", labelEn: "Facial & Treatments" },
+    { id: "styling", labelAr: "التصفيف والسيشوار", labelEn: "Styling & Blow Dry" },
   ];
 
   const filtered =
     activeCategory === "all"
-      ? SERVICES
-      : SERVICES.filter((s) => s.category === activeCategory);
+      ? branchServices
+      : branchServices.filter((s) => s.category === activeCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-12">
@@ -53,8 +56,8 @@ export default function BranchServicesPage({ params }: { params: Promise<{ branc
         </h1>
         <p className="text-sm sm:text-base text-ivory-muted leading-relaxed">
           {locale === "ar"
-            ? `يقدم فرع ${branch.nameAr} أرقى تجارب الحلاقة والعناية مع أدوات معقمة طبياً لكل عميل.`
-            : `Our ${branch.nameEn} branch delivers hospital-grade hygiene and Italian care products.`}
+            ? `يقدم فرع ${branch.nameAr} أرقى تجارب الحلاقة والعناية مع أدوات معقمة طبياً ومستحضرات إيطالية فاخرة.`
+            : `Our ${branch.nameEn} branch delivers hospital-grade hygiene and executive grooming standards.`}
         </p>
       </div>
 
@@ -84,14 +87,30 @@ export default function BranchServicesPage({ params }: { params: Promise<{ branc
           >
             <div className="space-y-4">
               <div className="flex justify-between items-start gap-4">
-                <h3 className="text-xl font-bold text-ivory group-hover:text-gold transition-colors">
-                  {locale === "ar" ? service.titleAr : service.titleEn}
-                </h3>
+                <div>
+                  <h3 className="text-xl font-bold text-ivory group-hover:text-gold transition-colors">
+                    {locale === "ar" ? service.titleAr : service.titleEn}
+                  </h3>
+                  {service.popular && (
+                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gold/15 text-gold border border-gold/30">
+                      {locale === "ar" ? "الأكثر طلباً" : "Popular"}
+                    </span>
+                  )}
+                </div>
+
                 <div className="text-right shrink-0">
-                  <span className="text-2xl font-bold text-gold font-serif">
-                    {service.priceEgp}
-                  </span>
-                  <span className="text-xs text-ivory-muted ml-1">EGP</span>
+                  {service.priceTextAr ? (
+                    <span className="text-lg font-bold text-gold font-serif">
+                      {locale === "ar" ? service.priceTextAr : service.priceTextEn}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-2xl font-bold text-gold font-serif">
+                        {service.priceEgp}
+                      </span>
+                      <span className="text-xs text-ivory-muted ml-1">EGP</span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -100,27 +119,25 @@ export default function BranchServicesPage({ params }: { params: Promise<{ branc
               </p>
             </div>
 
-            <div className="pt-6 border-t border-border mt-6 flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs text-ivory-muted">
-                <Clock className="w-4 h-4 text-gold" />
-                <span>
-                  {service.durationMinutes} {locale === "ar" ? "دقيقة" : "mins"}
-                </span>
-              </div>
+            <div className="pt-6 border-t border-border mt-6 flex items-center justify-between text-xs text-ivory-muted">
+              {service.durationMinutes ? (
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-gold" />
+                  <span>
+                    {service.durationMinutes} {locale === "ar" ? "دقيقة" : "mins"}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <Scissors className="w-4 h-4 text-gold" />
+                  <span>{locale === "ar" ? "تصفيف احترافي" : "Expert Grooming"}</span>
+                </div>
+              )}
 
-              <a
-                href={`https://wa.me/${branch.whatsapp}?text=${encodeURIComponent(
-                  locale === "ar"
-                    ? `مرحباً فرع ${branch.nameAr}، أود الاستفسار عن خدمة: ${service.titleAr}`
-                    : `Hello ${branch.nameEn} branch, I'd like to book: ${service.titleEn}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-surface-2 border border-gold/40 hover:border-gold text-gold hover:bg-gold hover:text-bg transition-all"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>{locale === "ar" ? "حجز عبر الواتساب" : "Book via WhatsApp"}</span>
-              </a>
+              <div className="flex items-center gap-1 text-[11px] text-gold/80">
+                <ShieldCheck className="w-3.5 h-3.5 text-gold" />
+                <span>{locale === "ar" ? "أدوات معقمة" : "Sterilized Tools"}</span>
+              </div>
             </div>
           </div>
         ))}

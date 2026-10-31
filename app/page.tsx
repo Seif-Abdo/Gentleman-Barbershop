@@ -80,8 +80,8 @@ export default function BranchSelectorLandingPage() {
 
           <p className="text-sm sm:text-base text-ivory-muted max-w-2xl mx-auto">
             {locale === "ar"
-              ? "لكل فرع فريق عمله المميز وتفاصيل الحجز والخدمات الخاصة به. اضغط على فرعك للمتابعة."
-              : "Each branch features its dedicated master barbers and contact hours. Click your branch to proceed."}
+              ? "لكل فرع فريق عمله المميز وتفاصيل الخدمات والأسعار الخاصة به. اضغط على فرعك للمتابعة."
+              : "Each branch features its dedicated master barbers and services menu. Click your branch to proceed."}
           </p>
         </div>
 

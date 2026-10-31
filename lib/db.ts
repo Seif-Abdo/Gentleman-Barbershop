@@ -91,7 +91,7 @@ const DEFAULT_ADMINS: AdminUser[] = [
   {
     id: "admin-newmaadi",
     username: "admin_newmaadi",
-    name: "مدير فرع المعادي الجديدة",
+    name: "مدير فرع مدينة نصر (أبوداود الظاهري)",
     role: "branch_admin",
     branchId: "new-maadi",
     password: "maadi2026",

@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { useLanguage } from "@/components/LanguageContext";
 import { DEFAULT_BRANCHES, Branch } from "@/config/branches";
 import { DEFAULT_BARBERS, Barber, getBarbersByBranch } from "@/config/barbers";
-import { SERVICES } from "@/content/services";
+import { getServicesForBranch } from "@/content/services";
 import {
   Scissors,
   Sparkles,
@@ -64,7 +64,8 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
   }
 
   const currentBranch = branch || DEFAULT_BRANCHES[0];
-  const popularServices = SERVICES.filter((s) => s.popular);
+  const branchServices = getServicesForBranch(branchSlug);
+  const popularServices = branchServices.filter((s) => s.popular);
 
   return (
     <div className="flex flex-col gap-16 md:gap-24 pb-16">
@@ -248,10 +249,18 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
                       : locale === "ar" ? "الأكثر طلباً" : "Popular"}
                   </span>
                   <div className="text-right">
-                    <span className="text-2xl font-bold text-gold font-serif">
-                      {service.priceEgp}
-                    </span>
-                    <span className="text-xs text-ivory-muted ml-1">EGP</span>
+                    {service.priceTextAr ? (
+                      <span className="text-base font-bold text-gold font-serif">
+                        {locale === "ar" ? service.priceTextAr : service.priceTextEn}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-2xl font-bold text-gold font-serif">
+                          {service.priceEgp}
+                        </span>
+                        <span className="text-xs text-ivory-muted ml-1">EGP</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -264,22 +273,21 @@ export default function BranchHomePage({ params }: { params: Promise<{ branch: s
               </div>
 
               <div className="pt-6 border-t border-border mt-6 flex items-center justify-between text-xs text-ivory-muted">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-gold" />
-                  <span>{service.durationMinutes} {locale === "ar" ? "دقيقة" : "min"}</span>
+                {service.durationMinutes ? (
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-gold" />
+                    <span>{service.durationMinutes} {locale === "ar" ? "دقيقة" : "min"}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <Scissors className="w-3.5 h-3.5 text-gold" />
+                    <span>{locale === "ar" ? "تصفيف احترافي" : "Expert Care"}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-[11px] text-gold/80">
+                  <ShieldCheck className="w-3.5 h-3.5 text-gold" />
+                  <span>{locale === "ar" ? "تعقيم طبي" : "Sterilized"}</span>
                 </div>
-                <a
-                  href={`https://wa.me/${currentBranch.whatsapp}?text=${encodeURIComponent(
-                    locale === "ar"
-                      ? `مرحباً صالون جنتل مان (فرع ${currentBranch.nameAr})، أود الاستفسار عن خدمة: ${service.titleAr}`
-                      : `Hello Gentleman Barbershop (${currentBranch.nameEn}), I'd like to book: ${service.titleEn}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-semibold text-gold hover:underline"
-                >
-                  {locale === "ar" ? "حجز بالواتساب" : "Book via WhatsApp"}
-                </a>
               </div>
             </div>
           ))}
