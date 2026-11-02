@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/components/LanguageContext";
 import { DEFAULT_BRANCHES, Branch } from "@/config/branches";
@@ -50,7 +51,18 @@ export default function BranchSelectorLandingPage() {
 
       <div className="max-w-5xl mx-auto w-full space-y-12 relative z-10">
         {/* Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-5">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light p-[2px] shadow-gold-glow flex items-center justify-center overflow-hidden animate-fade-in">
+            <Image
+              src="/logo.png"
+              alt="Gentleman Barbershop - Mohamed Rifai"
+              width={112}
+              height={112}
+              className="w-full h-full object-cover rounded-full bg-black"
+              priority
+            />
+          </div>
+
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-2 border border-gold/40 shadow-sm animate-fade-in">
             <Sparkles className="w-4 h-4 text-gold" />
             <span className="text-xs font-semibold tracking-wider text-gold uppercase">

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
 import { Shield, Lock, User, AlertCircle, ArrowLeft, ArrowRight, Scissors, Sparkles } from "lucide-react";
 
@@ -47,8 +48,15 @@ export default function PortalLoginPage() {
 
       <div className="max-w-md w-full bg-[#121212] border border-gold/40 rounded-3xl p-8 sm:p-10 space-y-7 shadow-gold-glow relative z-10">
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 mx-auto rounded-full bg-gold/15 border border-gold flex items-center justify-center text-gold shadow-sm">
-            <Scissors className="w-8 h-8 -rotate-45" />
+          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light p-[2px] shadow-gold-glow flex items-center justify-center overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Gentleman Barbershop - Mohamed Rifai"
+              width={80}
+              height={80}
+              className="w-full h-full object-cover rounded-full bg-black"
+              priority
+            />
           </div>
 
           <div>

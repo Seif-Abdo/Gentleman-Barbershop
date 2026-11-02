@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "./LanguageContext";
 import { useBranch } from "./BranchContext";
 import { Scissors, Phone, MapPin, Clock, MessageCircle, QrCode } from "lucide-react";
@@ -17,12 +18,23 @@ export function Footer() {
           {/* Brand Info & Active Branch */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold flex items-center justify-center">
-                <Scissors className="w-5 h-5 text-gold -rotate-45" />
+              <div className="w-12 h-12 rounded-full p-[1px] bg-gradient-to-br from-gold-dark via-gold to-gold-light shadow-gold-glow flex items-center justify-center overflow-hidden shrink-0">
+                <Image
+                  src="/logo.png"
+                  alt="Gentleman Barbershop"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover rounded-full bg-black"
+                />
               </div>
-              <span className="font-serif text-xl font-bold tracking-wider text-ivory">
-                GENTLEMAN
-              </span>
+              <div className="flex flex-col">
+                <span className="font-serif text-xl font-bold tracking-wider text-ivory">
+                  GENTLEMAN
+                </span>
+                <span className="text-[10px] text-gold tracking-widest uppercase font-semibold">
+                  MOHAMED RIFAI
+                </span>
+              </div>
             </div>
             <p className="text-sm text-ivory-muted leading-relaxed">
               {locale === "ar" ? currentBranch.taglineAr : currentBranch.taglineEn}

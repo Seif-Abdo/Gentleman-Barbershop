@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
 import { PortalNav } from "@/components/portal/PortalNav";
 import { DEFAULT_BRANCHES, Branch } from "@/config/branches";
@@ -167,8 +168,14 @@ export default function PortalQrPage() {
 
             {/* Logo & Brand Header */}
             <div className="space-y-2">
-              <div className="w-14 h-14 mx-auto rounded-full bg-gold/15 border border-gold flex items-center justify-center text-gold shadow-gold-glow">
-                <Scissors className="w-7 h-7 -rotate-45" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light p-[1.5px] shadow-gold-glow flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="Gentleman Barbershop"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover rounded-full bg-black"
+                />
               </div>
               <h2 className="font-serif tracking-widest text-2xl font-bold text-ivory">
                 GENTLEMAN

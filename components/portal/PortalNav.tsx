@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useLanguage } from "@/components/LanguageContext";
 import {
@@ -115,8 +116,14 @@ export function PortalNav({
           {/* Brand Identity */}
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <Link href="/portal" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gold/15 border border-gold flex items-center justify-center text-gold shadow-gold-glow group-hover:scale-105 transition-transform shrink-0">
-                <Scissors className="w-5 h-5 -rotate-45" />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light p-[1.5px] shadow-gold-glow group-hover:scale-105 transition-transform shrink-0 overflow-hidden flex items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="Gentleman Barbershop"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover rounded-full bg-black"
+                />
               </div>
               <div className="flex flex-col shrink-0">
                 <span className="font-serif tracking-widest text-base sm:text-lg font-bold text-ivory group-hover:text-gold transition-colors leading-tight">

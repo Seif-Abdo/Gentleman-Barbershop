@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "./LanguageContext";
 import { useBranch } from "./BranchContext";
@@ -32,10 +33,15 @@ export function Navbar() {
           {/* Brand Logo & Active Branch Indicator */}
           <div className="flex items-center gap-2 sm:gap-6 min-w-0">
             <Link href={`/${currentBranchId}`} className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light flex items-center justify-center p-[2px] shadow-gold-glow group-hover:scale-105 transition-transform shrink-0">
-                <div className="w-full h-full bg-bg rounded-full flex items-center justify-center">
-                  <Scissors className="w-4 h-4 sm:w-5 sm:h-5 text-gold transform -rotate-45 shrink-0" />
-                </div>
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-gold-dark via-gold to-gold-light flex items-center justify-center p-[1.5px] shadow-gold-glow group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="Gentleman Barbershop - Mohamed Rifai"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-cover rounded-full bg-black"
+                  priority
+                />
               </div>
               <div className="flex flex-col shrink-0">
                 <span className="font-serif tracking-wider text-lg sm:text-xl font-bold text-ivory group-hover:text-gold transition-colors leading-tight">
